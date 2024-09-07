@@ -31,6 +31,15 @@ use ViaThinkSoft\OIDplus\Core\OIDplusPagePluginAdmin;
 class OIDplusPageWTFunctions extends OIDplusPagePluginAdmin 
 {
 
+	public function tree(array &$json, string $ra_email=null, bool $nonjs=false, string $req_goto=''): bool {
+	      global $oidplus_admin_pages_tree_json;
+		
+		  $oidplus_admin_pages_tree_json = $json;
+		  if(function_exists('did_action') && !did_action('oidplus_admin_pages_tree')){
+			  do_action('oidplus_admin_pages_tree', $ra_email);
+		  }
+		  $json = $oidplus_admin_pages_tree_json;
+	}
 	/**
 	 * @param bool $html
 	 * @return void
