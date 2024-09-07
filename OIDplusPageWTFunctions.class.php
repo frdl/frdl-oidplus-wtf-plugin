@@ -39,6 +39,7 @@ class OIDplusPageWTFunctions extends OIDplusPagePluginAdmin
 			  do_action('oidplus_admin_pages_tree', $ra_email);
 		  }
 		  $json = $oidplus_admin_pages_tree_json;
+		return true;
 	}
 	/**
 	 * @param bool $html
