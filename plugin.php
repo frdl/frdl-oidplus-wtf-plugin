@@ -130,7 +130,7 @@ function public_pages_gui(?string $id = null){
     return $content;
 }
  
- function refresh_headér_shortcode($atts) {
+ function refresh_header_shortcode($atts) {
     // Extract shortcode attributes
     $atts = shortcode_atts(
         array(
@@ -168,7 +168,7 @@ function public_pages_gui(?string $id = null){
 	
 // Shortcode
 //add_shortcode('markdown', __NAMESPACE__.'\markdown');
-add_shortcode('RefreshHeader', __NAMESPACE__.'\refresh_headér_shortcode');
+add_shortcode('RefreshHeader', __NAMESPACE__.'\refresh_header_shortcode');
 add_shortcode('ObjectRepositoryLink', __NAMESPACE__.'\object_repository_link');
 add_shortcode('ListAllShortcodes', '\display_shortcodes');
 /*
