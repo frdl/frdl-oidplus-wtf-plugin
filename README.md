@@ -15,7 +15,7 @@ Inspired by
 https://gist.github.com/wehowski/d16a4ce9cdeb5da1e90f9a7b28b6ffdb#file-plugin-php
 
 # Plugins:
-The additioonal plugins Plugin (this one) is searching for pluginfiles in:
+The additional plugins Plugin (this one) is searching for pluginfiles in:
 - userdata/plugins/{pluginname}/plugin.php- 
 - userdata/plugins/{pluginname}.php
 - userdata/{tenantdir}/plugins/{pluginname}/plugin.php
