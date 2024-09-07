@@ -15,8 +15,9 @@ Inspired by
 https://gist.github.com/wehowski/d16a4ce9cdeb5da1e90f9a7b28b6ffdb#file-plugin-php
 
 # Plugins:
-- userdata/plugins/{pluginname}/plugin.php
-- userdata[/{tenantdir}]/plugins/{pluginname}/plugin.php
+- userdata/plugins/{pluginname}/plugin.php- 
+- userdata/plugins/{pluginname}.php
+- userdata/{tenantdir}/plugins/{pluginname}/plugin.php
 - plugins/{vendor}/{plugintype}/{pluginname}/plugin.php
 
 If [IO4](https://github.com/frdl/oidplus-io4-bridge-plugin) is installed, it uses its [invoker](https://github.com/PHP-DI/Invoker) method, otherwise a simple call_user_func, however for plugins this final callable/closure is optional to use or not.
