@@ -30,7 +30,44 @@ use ViaThinkSoft\OIDplus\Core\OIDplusPagePluginAdmin;
 
 class OIDplusPageWTFunctions extends OIDplusPagePluginAdmin 
 {
-
+   public function gui(string $id, array &$out, bool &$handled): void {
+	   global $oidplus_admin_pages_gui_id;
+       global $oidplus_admin_pages_gui_out;
+       global $oidplus_admin_pages_gui_handled;
+		
+ 
+	      $oidplus_admin_pages_gui_id = $id;
+		  $oidplus_admin_pages_gui_out = $out;
+		  $oidplus_admin_pages_gui_handled = $handled;
+		  if(!did_action('oidplus_admin_pages_gui')){
+			  do_action('oidplus_admin_pages_gui', $id);
+		  }
+		$out = $oidplus_admin_pages_gui_out;
+		$handled = (bool)$oidplus_admin_pages_gui_handled === true ? true : false;
+	 // unset($oidplus_public_pages_gui_out);	 
+	  unset($oidplus_admin_pages_gui_id);
+	//	THIS BRFEAKS HOME NO !	unset($handled);
+   }
+		
+	public function handle404(string $request): bool {
+		global $oidplus_handle_404_request;
+		global $oidplus_handle_404_rel_url_original;
+		global $oidplus_handle_404_handled_return_value;
+		
+		$oidplus_handle_404_handled_return_value = false;
+		$oidplus_handle_404_request = $request;
+		 $oidplus_handle_404_rel_url_original = $rel_url_original;	
+		  if(function_exists('did_action') && !did_action('oidplus_handle_404')){
+			  do_action('oidplus_handle_404', [$rel_url_original,$request]);
+		  }		
+		 $request = $oidplus_handle_404_request;
+		 $rel_url_original = $oidplus_handle_404_rel_url_original;
+			 
+		unset($oidplus_handle_404_request);
+		unset($oidplus_handle_404_rel_url_original);	
+		return $oidplus_handle_404_handled_return_value;
+	}
+			
 	public function tree(array &$json, string $ra_email=null, bool $nonjs=false, string $req_goto=''): bool {
 	      global $oidplus_admin_pages_tree_json;
 		
@@ -39,8 +76,10 @@ class OIDplusPageWTFunctions extends OIDplusPagePluginAdmin
 			  do_action('oidplus_admin_pages_tree', $ra_email);
 		  }
 		  $json = $oidplus_admin_pages_tree_json;
+		
 		return true;
-	}
+	}	
+	
 	/**
 	 * @param bool $html
 	 * @return void
