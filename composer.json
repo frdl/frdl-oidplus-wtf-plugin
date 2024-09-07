@@ -3,7 +3,7 @@
     "type": "oiplus-plugin-admin-pages",
     "description": "Shimmy shimmy WTF functions polyfill",
     "keywords": ["oiplus", "wordpress"],
-    "license":  ["MIT"],
+    "license":  ["MIT", "GPL-3.0"],
 	"homepage" : "https://hosted.oidplus.com/viathinksoft/?goto=oid%3A1.3.6.1.4.1.37476.9000.108.42531",
     "autoload" : {
         "classmap" : ["."]
