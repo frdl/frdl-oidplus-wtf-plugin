@@ -31,19 +31,18 @@ use ViaThinkSoft\OIDplus\Core\OIDplusPagePluginAdmin;
 class OIDplusPageWTFunctions extends OIDplusPagePluginAdmin 
 {
    public function gui(string $id, array &$out, bool &$handled): void {
-	   global $oidplus_admin_pages_gui_id;
-       global $oidplus_admin_pages_gui_out;
-       global $oidplus_admin_pages_gui_handled;
-		
- 
-	      $oidplus_admin_pages_gui_id = $id;
-		  $oidplus_admin_pages_gui_out = $out;
-		  $oidplus_admin_pages_gui_handled = $handled;
-		  if(!did_action('oidplus_admin_pages_gui')){
-			  do_action('oidplus_admin_pages_gui', $id);
-		  }
-		$out = $oidplus_admin_pages_gui_out;
-		$handled = (bool)$oidplus_admin_pages_gui_handled === true ? true : false;
+	   global $oidplus_admin_pages_gui_id;    
+	   global $oidplus_admin_pages_gui_out;     
+	   global $oidplus_admin_pages_gui_handled;
+	 
+	   $oidplus_admin_pages_gui_id = $id;		
+	   $oidplus_admin_pages_gui_out = $out;		
+	   $oidplus_admin_pages_gui_handled = $handled;		
+	   if(!did_action('oidplus_admin_pages_gui')){		
+		   do_action('oidplus_admin_pages_gui', $id);		
+	   }		
+	   $out = $oidplus_admin_pages_gui_out;		
+	   $handled = (bool)$oidplus_admin_pages_gui_handled === true ? true : false;
 	 // unset($oidplus_public_pages_gui_out);	 
 	  unset($oidplus_admin_pages_gui_id);
 	//	THIS BRFEAKS HOME NO !	unset($handled);
