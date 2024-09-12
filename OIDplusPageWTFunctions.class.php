@@ -138,10 +138,12 @@ class OIDplusPageWTFunctions extends OIDplusPagePluginPublic
 			
 		}	
  
-		    // userdata and tenant plugins, for OIDplus the are "anonympous"!?!
-			foreach( array_merge(glob(OIDplus::getUserDataDir('plugins')."*.php"),
+		    // userdata and tenant plugins, for OIDplus the are "anonympous"!?! 
+			foreach( array_merge(array_merge(glob(OIDplus::getUserDataDir('plugins')."*.php"),
 								 glob(OIDplus::getUserDataDir('plugins')."/*/plugin.php")
-					) as $file){
+					), array_merge(glob(OIDplus::getUserDataDir('wtf-plugins')."*.php"),
+								 glob(OIDplus::getUserDataDir('wtf-plugins')."/*/plugin.php")
+					)) as $file){
 				$pData = \get_file_data($file, ['Name'=>'Plugin Name', 'Author'=>'Author', 'Version'=>'Version', 'License'=>'License',]);
 				if(count($pData) >= 3){
 					$fn = include $file;
