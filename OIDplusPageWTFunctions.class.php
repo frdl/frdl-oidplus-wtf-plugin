@@ -16,13 +16,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
+//"Frdlweb\\OIDplus\\Plugins\\PublicPages\\WTFunctions\\"
 namespace Frdlweb\OIDplus\Plugins\PublicPages\WTFunctions;
 
 use ViaThinkSoft\OIDplus\Core\OIDplus;
 use ViaThinkSoft\OIDplus\Core\OIDplusException;
 use ViaThinkSoft\OIDplus\Core\OIDplusHtmlException;
 use ViaThinkSoft\OIDplus\Core\OIDplusPagePluginAdmin;
+use ViaThinkSoft\OIDplus\Core\OIDplusPagePluginPublic;
 
 // phpcs:disable PSR1.Files.SideEffects
 \defined('INSIDE_OIDPLUS') or die;
@@ -31,20 +32,21 @@ use ViaThinkSoft\OIDplus\Core\OIDplusPagePluginAdmin;
 class OIDplusPageWTFunctions extends OIDplusPagePluginPublic 
 {
    public function gui(string $id, array &$out, bool &$handled): void {
-	   global $oidplus_admin_pages_gui_id;    
-	   global $oidplus_admin_pages_gui_out;     
-	   global $oidplus_admin_pages_gui_handled;
-	 
-	   $oidplus_admin_pages_gui_id = $id;		
-	   $oidplus_admin_pages_gui_out = $out;		
-	   $oidplus_admin_pages_gui_handled = $handled;		
-	   if(!did_action('oidplus_admin_pages_gui')){		
-		   do_action('oidplus_admin_pages_gui', $id);		
-	   }		
-	   $out = $oidplus_admin_pages_gui_out;		
-	   $handled = (bool)$oidplus_admin_pages_gui_handled === true ? true : false;
+	   global $oidplus_public_pages_gui_id;
+       global $oidplus_public_pages_gui_out;
+       global $oidplus_public_pages_gui_handled;
+		
+ 
+	      $oidplus_public_pages_gui_id = $id;
+		  $oidplus_public_pages_gui_out = $out;
+		  $oidplus_public_pages_gui_handled = $handled;
+		  if(!did_action('oidplus_public_pages_gui')){
+			  do_action('oidplus_public_pages_gui', $id);
+		  }
+		$out = $oidplus_public_pages_gui_out;
+		$handled = (bool)$oidplus_public_pages_gui_handled === true ? true : false;
 	 // unset($oidplus_public_pages_gui_out);	 
-	  unset($oidplus_admin_pages_gui_id);
+	  unset($oidplus_public_pages_gui_id);
 	//	THIS BRFEAKS HOME NO !	unset($handled);
    }
 		
