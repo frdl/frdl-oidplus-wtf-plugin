@@ -17,7 +17,7 @@
  * limitations under the License.
  */
 
-namespace Frdlweb\OIDplus\Plugins\AdminPages\WTFunctions;
+namespace Frdlweb\OIDplus\Plugins\PublicPages\WTFunctions;
 
 use ViaThinkSoft\OIDplus\Core\OIDplus;
 use ViaThinkSoft\OIDplus\Core\OIDplusException;
