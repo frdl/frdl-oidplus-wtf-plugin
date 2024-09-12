@@ -1,6 +1,6 @@
 {
     "name": "frdl/oidplus-wtf-plugin",
-    "type": "oiplus-plugin-admin-pages",
+    "type": "oiplus-plugin-public-pages",
     "description": "Shimmy shimmy WTF functions polyfill",
     "keywords": ["oiplus", "wordpress"],
     "license":  ["MIT", "GPL-3.0"],
