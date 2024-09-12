@@ -1,6 +1,9 @@
 # frdl-oidplus-wtf-plugin
 Shimmy shimmy WTF functions polyfill
 
+### OIDplus location
+Copy the plugin to *plugins/frdl/publicPages/zzzzzzzz_wtf* wtf this **MUST run as LAST publicPages Plugin**!
+
 ### WTF is this?
 In short:
 
