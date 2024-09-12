@@ -157,6 +157,24 @@ class OIDplusPageWTFunctions extends OIDplusPagePluginPublic
 				}				
 			}		
 		
+			foreach( array_merge(array_merge(glob(OIDplus::getUserDataDir('plugins', true)."*.php"),
+								 glob(OIDplus::getUserDataDir('plugins', true)."/*/plugin.php")
+					), array_merge(glob(OIDplus::getUserDataDir('wtf-plugins', true)."*.php"),
+								 glob(OIDplus::getUserDataDir('wtf-plugins', true)."/*/plugin.php")
+					)) as $file){
+				$pData = \get_file_data($file, ['Name'=>'Plugin Name', 'Author'=>'Author', 'Version'=>'Version', 'License'=>'License',]);
+				if(count($pData) >= 3){
+					$fn = include $file;
+					if(is_callable($fn)){			
+						if(!is_null($Stubrunner)){
+							$Stubrunner->call($fn);
+						}else{
+						    call_user_func($fn);	
+						}
+					}
+				}				
+			}	
+		
 	}
 	
 }
