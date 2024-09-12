@@ -70,14 +70,24 @@ class OIDplusPageWTFunctions extends OIDplusPagePluginPublic
 	}
 			
 	public function tree(array &$json, string $ra_email=null, bool $nonjs=false, string $req_goto=''): bool {
-	      global $oidplus_admin_pages_tree_json;
+           global $oidplus_public_pages_tree_json;
+ 	 
+		       $oidplus_public_pages_tree_json = $json;		
+			  if(function_exists('did_action') && !did_action('oidplus_public_pages_tree')){		
+				  do_action('oidplus_public_pages_tree', $ra_email);		
+			  }			  
+			  $json = $oidplus_public_pages_tree_json;
+		// unset($oidplus_public_pages_tree_json);
+		/*  THIS YOU HAVE TO IMPLEMENT, NOW IT IS IN IO4 WHAT IS NOT A GOOD PLACE!!!
 		
-		  $oidplus_admin_pages_tree_json = $json;
-		  if(function_exists('did_action') && !did_action('oidplus_admin_pages_tree')){
-			  do_action('oidplus_admin_pages_tree', $ra_email);
+		  if (OIDplus::authUtils()->isAdminLoggedIn()) {
+			  $oidplus_admin_pages_tree_json = $json;		
+			  if(function_exists('did_action') && !did_action('oidplus_admin_pages_tree')){		
+				  do_action('oidplus_admin_pages_tree', $ra_email);		
+			  }			  
+			  $json = $oidplus_admin_pages_tree_json;
 		  }
-		  $json = $oidplus_admin_pages_tree_json;
-		
+		*/
 		return true;
 	}	
 	
