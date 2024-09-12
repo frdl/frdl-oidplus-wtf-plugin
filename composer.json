@@ -9,7 +9,7 @@
         "classmap" : ["."]
     },
     "extra" : {
-        "installer-name" : "00000000_wtf"
+        "installer-name" : "zzzzzzzz_wtf"
     },
 	"suggest": {
 		"danielmarschall/oidplus": "The main project, this must be your root composer.json project!",
