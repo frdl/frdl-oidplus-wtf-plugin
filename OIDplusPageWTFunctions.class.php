@@ -28,7 +28,7 @@ use ViaThinkSoft\OIDplus\Core\OIDplusPagePluginAdmin;
 \defined('INSIDE_OIDPLUS') or die;
 // phpcs:enable PSR1.Files.SideEffects
 
-class OIDplusPageWTFunctions extends OIDplusPagePluginAdmin 
+class OIDplusPageWTFunctions extends OIDplusPagePluginPublic 
 {
    public function gui(string $id, array &$out, bool &$handled): void {
 	   global $oidplus_admin_pages_gui_id;    
