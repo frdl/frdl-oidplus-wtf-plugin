@@ -139,8 +139,8 @@ class OIDplusPageWTFunctions extends OIDplusPagePluginPublic
 		}	
  
 		    // userdata and tenant plugins, for OIDplus the are "anonympous"!?! 
-			foreach( array_merge(array_merge(glob(OIDplus::getUserDataDir('plugins')."*.php"),
-								 glob(OIDplus::getUserDataDir('plugins')."/*/plugin.php")
+			foreach( array_merge(array_merge(glob(OIDplus::getUserDataDir('')."/plugins/*.php"),
+								 glob(OIDplus::getUserDataDir('')."/plugins/*/plugin.php")
 					), array_merge(glob(OIDplus::getUserDataDir('wtf-plugins')."*.php"),
 								 glob(OIDplus::getUserDataDir('wtf-plugins')."/*/plugin.php")
 					)) as $file){
@@ -157,8 +157,8 @@ class OIDplusPageWTFunctions extends OIDplusPagePluginPublic
 				}				
 			}		
 		
-			foreach( array_merge(array_merge(glob(OIDplus::getUserDataDir('plugins', true)."*.php"),
-								 glob(OIDplus::getUserDataDir('plugins', true)."/*/plugin.php")
+			foreach( array_merge(array_merge(glob(OIDplus::getUserDataDir('', true)."/plugins/*.php"),
+								 glob(OIDplus::getUserDataDir('', true)."/plugins/*/plugin.php")
 					), array_merge(glob(OIDplus::getUserDataDir('wtf-plugins', true)."*.php"),
 								 glob(OIDplus::getUserDataDir('wtf-plugins', true)."/*/plugin.php")
 					)) as $file){
