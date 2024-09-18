@@ -139,7 +139,7 @@ class OIDplusPageWTFunctions extends OIDplusPagePluginPublic
 		}	
  
 		    // userdata and tenant plugins, for OIDplus the are "anonympous"!?! 
-			foreach(  array_merge(glob(OIDplus::getUserDataDir('')."/plugins/*.php"),
+			foreach(  array_merge(glob(OIDplus::getUserDataDir('', true)."/plugins/*/*/*/wtf-plugin.php"),
 								 glob(OIDplus::getUserDataDir('')."/plugins/*/*/*/wtf-plugin.php")
 					)  as $file){
 				$pData = \get_file_data($file, ['Name'=>'Plugin Name', 'Author'=>'Author', 'Version'=>'Version', 'License'=>'License',]);
@@ -155,21 +155,7 @@ class OIDplusPageWTFunctions extends OIDplusPagePluginPublic
 				}				
 			}		
 		
-			foreach(  array_merge(glob(OIDplus::getUserDataDir('', true)."/plugins/*.php"),
-								 glob(OIDplus::getUserDataDir('', true)."/plugins/*/*/*/wtf-plugin.php")
-					)  as $file){
-				$pData = \get_file_data($file, ['Name'=>'Plugin Name', 'Author'=>'Author', 'Version'=>'Version', 'License'=>'License',]);
-				if(count($pData) >= 3){
-					$fn = include $file;
-					if(is_callable($fn)){			
-						if(!is_null($Stubrunner)){
-							$Stubrunner->call($fn);
-						}else{
-						    call_user_func($fn);	
-						}
-					}
-				}				
-			}	
+			 
 		 
 	}
 	
