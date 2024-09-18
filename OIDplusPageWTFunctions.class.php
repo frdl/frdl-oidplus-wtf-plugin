@@ -120,7 +120,7 @@ class OIDplusPageWTFunctions extends OIDplusPagePluginPublic
 		//Pluginfiles
 		foreach(OIDplus::getAllPlugins() as $plugin){
 			$dir = $plugin->getPluginDirectory();
-			$file = rtrim($dir, '\\/ ').\DIRECTORY_SEPARATOR.'plugin.php';
+			$file = rtrim($dir, '\\/ ').\DIRECTORY_SEPARATOR.'wtf-plugin.php';
 			if(file_exists($file)){
 				//this my be different from OIDplus Plugin manifest.json, mhh...???
 				$pData = \get_file_data($file, ['Name'=>'Plugin Name', 'Author'=>'Author', 'Version'=>'Version', 'License'=>'License',]);
@@ -139,11 +139,9 @@ class OIDplusPageWTFunctions extends OIDplusPagePluginPublic
 		}	
  
 		    // userdata and tenant plugins, for OIDplus the are "anonympous"!?! 
-			foreach( array_merge(array_merge(glob(OIDplus::getUserDataDir('')."/plugins/*.php"),
-								 glob(OIDplus::getUserDataDir('')."/plugins/*/plugin.php")
-					), array_merge(glob(OIDplus::getUserDataDir('wtf-plugins')."*.php"),
-								 glob(OIDplus::getUserDataDir('wtf-plugins')."/*/plugin.php")
-					)) as $file){
+			foreach(  array_merge(glob(OIDplus::getUserDataDir('')."/plugins/*.php"),
+								 glob(OIDplus::getUserDataDir('')."/plugins/*/*/*/wtf-plugin.php")
+					)  as $file){
 				$pData = \get_file_data($file, ['Name'=>'Plugin Name', 'Author'=>'Author', 'Version'=>'Version', 'License'=>'License',]);
 				if(count($pData) >= 3){
 					$fn = include $file;
@@ -157,11 +155,9 @@ class OIDplusPageWTFunctions extends OIDplusPagePluginPublic
 				}				
 			}		
 		
-			foreach( array_merge(array_merge(glob(OIDplus::getUserDataDir('', true)."/plugins/*.php"),
-								 glob(OIDplus::getUserDataDir('', true)."/plugins/*/plugin.php")
-					), array_merge(glob(OIDplus::getUserDataDir('wtf-plugins', true)."*.php"),
-								 glob(OIDplus::getUserDataDir('wtf-plugins', true)."/*/plugin.php")
-					)) as $file){
+			foreach(  array_merge(glob(OIDplus::getUserDataDir('', true)."/plugins/*.php"),
+								 glob(OIDplus::getUserDataDir('', true)."/plugins/*/*/*/wtf-plugin.php")
+					)  as $file){
 				$pData = \get_file_data($file, ['Name'=>'Plugin Name', 'Author'=>'Author', 'Version'=>'Version', 'License'=>'License',]);
 				if(count($pData) >= 3){
 					$fn = include $file;
@@ -174,7 +170,7 @@ class OIDplusPageWTFunctions extends OIDplusPagePluginPublic
 					}
 				}				
 			}	
-		
+		 
 	}
 	
 }
