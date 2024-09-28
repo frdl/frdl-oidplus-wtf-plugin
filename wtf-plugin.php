@@ -168,9 +168,17 @@ function public_pages_gui(?string $id = null){
 	
 // Shortcode
 //add_shortcode('markdown', __NAMESPACE__.'\markdown');
-add_shortcode('RefreshHeader', __NAMESPACE__.'\refresh_header_shortcode');
-add_shortcode('ObjectRepositoryLink', __NAMESPACE__.'\object_repository_link');
-add_shortcode('ListAllShortcodes', '\display_shortcodes');
+
+function prepare_shortcode(){
+    add_shortcode('RefreshHeader', __NAMESPACE__.'\refresh_header_shortcode');
+    add_shortcode('ObjectRepositoryLink', __NAMESPACE__.'\object_repository_link');
+    add_shortcode('ListAllShortcodes', '\display_shortcodes');
+}	
+	
+//oidplus_prepare_shortcode
+add_action(	'oidplus_prepare_shortcode',	__NAMESPACE__.'\prepare_shortcode',	0, null);
+	
+	
 /*
 add_action(
 		'oidplus_public_pages_tree',
