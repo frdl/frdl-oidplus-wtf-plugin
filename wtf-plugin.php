@@ -163,21 +163,16 @@ function public_pages_gui(?string $id = null){
     return sprintf('<a href="%1$s" title="%2$s" class="%4$s">%3$s</a>', $atts['url'], $atts['title'], $atts['title'], $atts['class']);
 }
 
-
 	
-	
-// Shortcode
-//add_shortcode('markdown', __NAMESPACE__.'\markdown');
-
 function prepare_shortcode(){
-    add_shortcode('RefreshHeader', __NAMESPACE__.'\refresh_header_shortcode');
+	add_shortcode('RefreshHeader', __NAMESPACE__.'\refresh_header_shortcode');
     add_shortcode('ObjectRepositoryLink', __NAMESPACE__.'\object_repository_link');
     add_shortcode('ListAllShortcodes', '\display_shortcodes');
 }	
 	
-//oidplus_prepare_shortcode
-add_action(	'oidplus_prepare_shortcode',	__NAMESPACE__.'\prepare_shortcode',	0, null);
 	
+// Shortcode
+//add_shortcode('markdown', __NAMESPACE__.'\markdown');
 	
 /*
 add_action(
@@ -192,7 +187,7 @@ add_action(	'oidplus_public_pages_gui',	__NAMESPACE__.'\public_pages_gui',	0, nu
 
 //you can use autowiring as from container->invoker->call( \callable | closure(autowired arguments), [parameters]) !!!
 return (function( ){
-	 
+ add_action(	'oidplus_prepare_shortcode',	__NAMESPACE__.'\prepare_shortcode',	0, null);	 
 });
 	
 }//namespace of the plugin
