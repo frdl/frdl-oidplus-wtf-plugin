@@ -234,6 +234,7 @@ class OIDplusPageWTFunctions extends OIDplusPagePluginPublic
 					 $pageHTML = str_replace(static::BODY_REPLACER, $page['html'], $tpl);
 					 echo $pageHTML;
 					break;
+				case 'cms' ===$format && !function_exists('\io4\container') :	
 				case 'html' :
 				case 'body' :
 					default :
@@ -320,13 +321,29 @@ class OIDplusPageWTFunctions extends OIDplusPagePluginPublic
 			  \call_user_func_array(function(string $file){
 	  	            require_once $file;
               return function_exists('add_action');	 
-           }, [	__DIR__.\DIRECTORY_SEPARATOR.'WPHooksFunctions.class.php',
-	     -1]));		
+           }, [	__DIR__.\DIRECTORY_SEPARATOR.'WPHooksFunctions.class.php']));		
 
 		
 		  if(!$isWPHooksFunctionsInstalled){
 			 throw new \Exception('Could not init wp-functions-shim in '.__METHOD__.' '.__LINE__);  
 		  }
+		
+		
+		
+		$isFunctionsInstalled 
+		   = (//true === @\WPHooksFunctions::defined ||
+			  function_exists('oidplus_quota_used_db') ||
+			  \call_user_func_array(function(string $file){
+	  	            require_once $file;
+              return function_exists('oidplus_quota_used_db');	 
+           }, [	__DIR__.\DIRECTORY_SEPARATOR.'oidplus-functions.php']));		
+
+		
+		  if(!$isFunctionsInstalled){
+			 throw new \Exception('Could not init oidplus-functions in '.__METHOD__.' '.__LINE__);  
+		  }
+				
+		
 		
 	    $io4Plugin = OIDplus::getPluginByOid("1.3.6.1.4.1.37476.9000.108.19361.24196");
 		if (!is_null($io4Plugin) ) {
