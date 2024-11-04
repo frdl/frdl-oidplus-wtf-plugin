@@ -1,7 +1,7 @@
 <?php
 /**
- * Plugin Name: IO4 
- * Description: This is an example OIDplus/IO4-Plugin aware and enabled Plugin.
+ * Plugin Name: WTF 
+ * Description: This is an example OIDplus/WTF-Plugin aware and enabled Plugin.
  * Version: 0.0.1
  * Author: Frdlweb
  * Author URI: https://frdl.de
@@ -162,9 +162,26 @@ function public_pages_gui(?string $id = null){
   
     return sprintf('<a href="%1$s" title="%2$s" class="%4$s">%3$s</a>', $atts['url'], $atts['title'], $atts['title'], $atts['class']);
 }
+	
+ function iframe_shortcode($atts) {
+    global $oidplus_current_page_context;
+	 
+    $atts = shortcode_atts(
+        array(
+            'url' => 'https://rdap.frdlweb.de/',
+			'width'=>'100%',
+			'height'=>'640',
+        ),
+        $atts
+    );
 
+  
+    return sprintf('<iframe src="%1$s" width="%2$s" height="%3$s" style="border:none;"></iframe>', 
+				   $atts['url'], $atts['width'], $atts['height']);
+}
 	
 function prepare_shortcode(){
+	add_shortcode('IncludeFrame', __NAMESPACE__.'\iframe_shortcode');
 	add_shortcode('RefreshHeader', __NAMESPACE__.'\refresh_header_shortcode');
     add_shortcode('ObjectRepositoryLink', __NAMESPACE__.'\object_repository_link');
     add_shortcode('ListAllShortcodes', '\display_shortcodes');
