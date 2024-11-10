@@ -1,7 +1,7 @@
 <?php
 
 namespace {
-	
+\defined('INSIDE_OIDPLUS') or die;	
  function oidplus_format_bytes($bytes, $precision = 2)
 	{
 		$units = array('B', 'KB', 'MB', 'GB', 'TB');
