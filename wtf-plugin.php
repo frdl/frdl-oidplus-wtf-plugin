@@ -22,7 +22,7 @@ use Frdlweb\OIDplus\Plugins\AdminPages\IO4\OIDplusPagePublicIO4;
 
 
  
-
+\defined('INSIDE_OIDPLUS') or die;
 
 
 function public_pages_tree(?string $ra_mail){
