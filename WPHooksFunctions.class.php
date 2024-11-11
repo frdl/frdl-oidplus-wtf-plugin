@@ -126,7 +126,7 @@ function frdl_ini_dot_parse(string $text, ?bool $clear = false) : array {
  * @param string $tag An HTML tag name. Example: 'video'.
  * @return string Tag RegEx.
  */
-function get_tag_regex( $tag ) {
+function get_tag_regex( string $tag ) {
 	if ( empty( $tag ) ) {
 		return '';
 	}
@@ -158,7 +158,7 @@ function get_tag_regex( $tag ) {
  *
  * @return bool Whether the slug represents the UTF-8 encoding.
  */
-function _is_utf8_charset( $charset_slug ) {
+function _is_utf8_charset(string $charset_slug ) : bool {
 	if ( ! is_string( $charset_slug ) ) {
 		return false;
 	}
@@ -198,7 +198,7 @@ function _is_utf8_charset( $charset_slug ) {
  *                                  Default value is to infer from "blog_charset" option.
  * @return bool Whether the slug represents the UTF-8 encoding.
  */
-function is_utf8_charset( $blog_charset = null ) {
+function is_utf8_charset(string|null  $blog_charset = null ) : bool {
 	return _is_utf8_charset( $blog_charset ?? get_option( 'blog_charset' ) );
 }
 
@@ -214,7 +214,7 @@ function is_utf8_charset( $blog_charset = null ) {
  * @param string $charset A charset name, e.g. "UTF-8", "Windows-1252", "SJIS".
  * @return string The canonical form of the charset.
  */
-function _canonical_charset( $charset ) {
+function _canonical_charset(string $charset ) {
 	if ( is_utf8_charset( $charset ) ) {
 		return 'UTF-8';
 	}
@@ -261,7 +261,7 @@ function _canonical_charset( $charset ) {
  * @param bool $reset Optional. Whether to reset the encoding back to a previously-set encoding.
  *                    Default false.
  */
-function mbstring_binary_safe_encoding( $reset = false ) {
+function mbstring_binary_safe_encoding( bool $reset = false ) {
 	static $encodings  = array();
 	static $overloaded = null;
 
@@ -312,7 +312,7 @@ function reset_mbstring_encoding() {
  * @param mixed $value Boolean value to validate.
  * @return bool Whether the value is validated.
  */
-function wp_validate_boolean( $value ) {
+function wp_validate_boolean( mixed $value ) : bool {
 	if ( is_bool( $value ) ) {
 		return $value;
 	}
@@ -336,7 +336,7 @@ function wp_validate_boolean( $value ) {
  * @param string $str Header comment to clean up.
  * @return string
  */
-function _cleanup_header_comment( $str ) {
+function _cleanup_header_comment(string $str ) : string {
 	return trim( preg_replace( '/\s*(?:\*\/|\?>).*/', '', $str ) );
 }
 /**
@@ -445,7 +445,7 @@ Description (cf. twentyeleven)
  *                                Default empty string.
  * @return string[] Array of file header values keyed by header name.
  */
-function get_file_data( $file, $default_headers, $context = '' ) {
+function get_file_data(string $file,array $default_headers,string $context = '' ) {
 	// Pull only the first 8 KB of the file in.
 	// define( 'KB_IN_BYTES', 1024 );
 	$file_data = file_get_contents( $file, false, null, 0, 8 * (defined('KB_IN_BYTES') ? \KB_IN_BYTES : 1024));
@@ -502,7 +502,7 @@ function get_file_data( $file, $default_headers, $context = '' ) {
  * @return boolean true
  */
 if(!function_exists('add_filter')){
-function add_filter($tag, $function_to_add, $priority = 10, $accepted_args = 1)
+function add_filter(string $tag, string | array | \callable | \Closure $function_to_add,  int | bool | null  $priority = 10, int | null $accepted_args = 1)
 {
 	  return \call_user_func_array([\Webfan\Patches\WPHooks::getInstance(), __FUNCTION__], func_get_args());
 	//return Whooks::addFilter($tag, $function_to_add, $priority, $accepted_args);
@@ -518,7 +518,7 @@ function add_filter($tag, $function_to_add, $priority = 10, $accepted_args = 1)
  * @return boolean Whether the function existed before it was removed.
  */
 if(!function_exists('remove_filter')){
-function remove_filter($tag, $function_to_remove, $priority = 10)
+function remove_filter(string $tag,  string | array | \callable | \Closure $function_to_remove, int | bool | null $priority = 10)
 {
   return \call_user_func_array([\Webfan\Patches\WPHooks::getInstance(), __FUNCTION__], func_get_args());
 	//	return Whooks::removeFilter($tag, $function_to_remove, $priority);
@@ -532,7 +532,7 @@ function remove_filter($tag, $function_to_remove, $priority = 10)
  * @return bool true when finished.
  */
 if(!function_exists('remove_all_filters')){
-function remove_all_filters($tag, $priority = false)
+function remove_all_filters(string $tag,  int | bool | null  $priority = false) : bool
 {
   return \call_user_func_array([\Webfan\Patches\WPHooks::getInstance(), __FUNCTION__], func_get_args());
 	//	return Whooks::removeAllFilters($tag, $priority);
@@ -565,7 +565,7 @@ function has_filter($tag, $function_to_check = false)
  * @return mixed The filtered value after all hooked functions are applied to it.
  */
 if(!function_exists('apply_filters')){
-function apply_filters($tag, $value)
+function apply_filters(string $tag, mixed $value)
 {
 	  return \call_user_func_array([\Webfan\Patches\WPHooks::getInstance(), __FUNCTION__], func_get_args());
 	//return Whooks::applyFilters($tag, $value);
@@ -579,7 +579,7 @@ function apply_filters($tag, $value)
  * @return mixed The filtered value after all hooked functions are applied to it.
  */
 if(!function_exists('apply_filters_ref_array')){
-function apply_filters_ref_array($tag, $args)
+function apply_filters_ref_array(string $tag, mixed $args)
 {
 	  return \call_user_func_array([Hooks::getInstance(), __FUNCTION__], func_get_args());
 	//return Whooks::applyFiltersRefArray($tag, $args);
@@ -598,7 +598,7 @@ function apply_filters_ref_array($tag, $args)
  * @return mixed
  */
 if(!function_exists('add_action')){
-function add_action($tag, $function_to_add, $priority = 10, $accepted_args = 1)
+function add_action(string $tag, string | array | \callable | \Closure $function_to_add, int | bool | null $priority = 10,int |null $accepted_args = 1)
 {
 	  return \call_user_func_array([\Webfan\Patches\WPHooks::getInstance(), __FUNCTION__], func_get_args());
 	//return Whooks::addAction($tag, $function_to_add, $priority, $accepted_args);
@@ -631,7 +631,7 @@ function has_action($tag, $function_to_check = false)
  * @return boolean Whether the function is removed.
  */
 if(!function_exists('remove_action')){
-function remove_action($tag, $function_to_remove, $priority = 10)
+function remove_action(string $tag, string | array | \callable | \Closure  $function_to_remove,int | bool | null $priority = 10)
 {
 	  return \call_user_func_array([\Webfan\Patches\WPHooks::getInstance(), __FUNCTION__], func_get_args());
 	//return Whooks::removeAction($tag, $function_to_remove, $priority);
@@ -645,7 +645,7 @@ function remove_action($tag, $function_to_remove, $priority = 10)
  * @return bool True when finished.
  */
 if(!function_exists('remove_all_actions')){
-function remove_all_actions($tag, $priority = false)
+function remove_all_actions(string $tag,int | bool | null $priority = false)
 {
 	  return \call_user_func_array([\Webfan\Patches\WPHooks::getInstance(), __FUNCTION__], func_get_args());
 	//return Whooks::removeAllActions($tag, $priority);
@@ -660,7 +660,7 @@ function remove_all_actions($tag, $priority = false)
  * @return null Will return null if $tag does not exist in $filter array
  */
 if(!function_exists('do_action')){
-function do_action($tag, $arg = '')
+function do_action(string $tag, mixed $arg = '')
 {
 	  return \call_user_func_array([\Webfan\Patches\WPHooks::getInstance(), __FUNCTION__], func_get_args());
 	//return Whooks::doAction($tag, $arg);
@@ -674,7 +674,7 @@ function do_action($tag, $arg = '')
  * @return null Will return null if $tag does not exist in $filter array
  */
 if(!function_exists('do_action_ref_array')){
-function do_action_ref_array($tag, $args)
+function do_action_ref_array(string $tag, array $args)
 {
 	  return \call_user_func_array([\Webfan\Patches\WPHooks::getInstance(), __FUNCTION__], func_get_args());
 	//return Whooks::doActionRefArray($tag, $args);
@@ -687,7 +687,7 @@ function do_action_ref_array($tag, $args)
  * @return int The number of times action hook <tt>$tag</tt> is fired
  */
 if(!function_exists('did_action')){
-function did_action($tag)
+function did_action(string $tag)
 {
 	  return \call_user_func_array([\Webfan\Patches\WPHooks::getInstance(), __FUNCTION__], func_get_args());
 	//return Whooks::didAction($tag);
@@ -731,7 +731,7 @@ function current_action()
  * @return bool Whether the filter is currently in the stack
  */
 if(!function_exists('doing_filter')){
-function doing_filter($filter = null)
+function doing_filter(null|string $filter = null) : bool
 {
 	  return \call_user_func_array([\Webfan\Patches\WPHooks::getInstance(), __FUNCTION__], func_get_args());
 	//return Whooks::doingFilter($filter);
@@ -745,7 +745,7 @@ function doing_filter($filter = null)
  * @return bool Whether the action is currently in the stack.
  */
 if(!function_exists('doing_action')){
-function doing_action($action = null)
+function doing_action(string|null $action = null) : bool
 {
   return \call_user_func_array([\Webfan\Patches\WPHooks::getInstance(), __FUNCTION__], func_get_args());
 	//	return Whooks::doingAction($action);
