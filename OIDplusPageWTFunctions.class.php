@@ -337,7 +337,7 @@ class OIDplusPageWTFunctions extends OIDplusPagePluginPublic
 			  \call_user_func_array(function(string $file){
 	  	            require_once $file;
               return function_exists('oidplus_quota_used_db');	 
-           }, [	__DIR__.\DIRECTORY_SEPARATOR.'oidplus-functions.php']));		
+           }, [	__DIR__.\DIRECTORY_SEPARATOR.'oidplus-functions.inc.php']));		
 
 		
 		  if(!$isFunctionsInstalled){
