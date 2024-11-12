@@ -21,114 +21,9 @@ use ViaThinkSoft\OIDplus\Core\OIDplusPlugin;
 use Frdlweb\OIDplus\Plugins\AdminPages\IO4\OIDplusPagePublicIO4;
 
 
- 
-\defined('INSIDE_OIDPLUS') or die;
+ \defined('INSIDE_OIDPLUS') or die;
 
 
-function public_pages_tree(?string $ra_mail){
-	  global $oidplus_public_pages_tree_json;
-	 
- 
-	
-	$json =$oidplus_public_pages_tree_json;
-		$Array = (new \Wehowski\Helpers\ArrayHelper($json)) ;
-	
-		 
-	 
-		$Array
-			//->after(1)
-			->add([
-		    'id' => 'oidplus:webfan_registry_hosting',
-		 	'icon' => 'https://webfan.de/favicon.ico',
-			 'a_attr'=>[
-			 	 'href'=>'https://webfan.de/admin/registry/?host='.urlencode($_SERVER['HTTP_HOST']),
-			 ],
-			 //  //'href'=>OIDplus::webpath(null,OIDplus::PATH_ABSOLUTE_CANONICAL),
-			'text' => _L('OID & Registry Hosting'),
-	   ]);
-	
-	  
-
- 
-	$json = $Array->all();
-	$oidplus_public_pages_tree_json = $json; 
-}
-
-
-
-
-function public_pages_gui(?string $id = null){
-	  global $oidplus_public_pages_gui_out;
-	  global $oidplus_public_pages_gui_handled;
-	
-	 
-		 if('oidplus:webfan_registry_hosting'===$id){	 
-			 $oidplus_public_pages_gui_handled = true;
-			 $oidplus_public_pages_gui_out['title'] =  'OID Hosting';
-			 $homelink ='https://webfan.de/admin/registry/?host='.urlencode($_SERVER['HTTP_HOST']);
-			 $oidplus_public_pages_gui_out['text']  .= '<a href="'.$homelink.'">'.$homelink.'</a>'
-				 .sprintf('<meta http-equiv="refresh" content="0; URL=%s">', $homelink);
-
-			 $oidplus_public_pages_gui_out['icon'] = 'https://webfan.de/favicon.ico'; 
-		 }	 
-		
-}
-
-	
- function base64_url_encode($input) {
-   return strtr(base64_encode($input), '+/=', '~_-');
- }
-
- function base64_url_decode($input) {
-   return base64_decode(strtr($input, '~_-', '+/='));
- }	
-
-
- function isBase64Encoded($str)
-	{
-		try
-
-		{
-		$decoded = base64_decode($str, true);
-
-		if ( base64_encode($decoded) === $str ) {
-		    return true;
-		}
-		else {
-		    return false;
-		}
-
-		}catch(\Exception $e){
-			// If exception is caught, then it is not a base64 encoded string
-			return false;
-		}
- }
-
- function markdown($atts) {
-	 if(!isset($atts['content'])){
-		throw new \Exception('Content attribute must be set in '.__FUNCTION__); 
-	 }
-    // Extract shortcode attributes
-    $atts = shortcode_atts(
-        array(
-            'content'=>isBase64Encoded($atts['content']) ? base64_decode($atts['content']) : $atts['content'],
-        ),
-        $atts
-    );
-       $atts['content'] = isBase64Encoded($atts['content']) ? base64_decode($atts['content']) : $atts['content'];
-	 
-	 
-	     $frontMatter = new \Webuni\FrontMatter\FrontMatter();
-
-          $document = $frontMatter->parse($atts['content'] );
-
-           $data = $document->getData();
-           $content = $document->getContent();
-	 
-	 
- 
-    return $content;
-}
  
  function refresh_header_shortcode($atts) {
     // Extract shortcode attributes
@@ -180,31 +75,74 @@ function public_pages_gui(?string $id = null){
 				   $atts['url'], $atts['width'], $atts['height']);
 }
 	
+
+	
+function modifyContent(string $id) {
+	    global $oidplus_content_title;
+	    global $oidplus_content_icon;
+	    global $oidplus_content_text;	
+	
+	   $CRUD = '';
+	
+	    $obj = OIDplusObject::parse($id);
+	
+		if($obj){
+					    $data = \frdl_ini_dot_parse($obj->getDescription())["data"];
+					    $data_json_string = json_encode($data, \JSON_PRETTY_PRINT);
+					    $content_display_data = '<pre>'.$data_json_string.'</pre>';
+			
+			           $CRUD.= '<legend>Data from 
+					    <a href="'
+						   .OIDplus::baseConfig()->getValue('RDAP_ROOT_CLIENT_SERVER', 'https://oid.zone/rdap/')
+							   .'oid/1.3.6.1.4.1.37476.9000.108.1276945.19361.24174" target="_blank">
+					    	1.3.6.1.4.1.37476.9000.108.1276945.19361.24174
+						</a>
+					   </legend>';
+			           $CRUD.= $content_display_data;
+			
+			  switch($obj::ns()){
+				  case 'ipv4' :
+				  case 'ipv6' :
+					  //   putenv('IO4_WORKSPACE_SCOPE=@global');
+					  //   putenv('IO4_WORKSPACE_SCOPE=@www');
+					  //   putenv('IO4_WORKSPACE_SCOPE=@cwd');
+					  //   $content.= //getenv('IO4_WORKSPACE_SCOPE').
+						//	 'Please note that the IPs listed here are for internal use and'
+						// .' may NOT be accessable via the REAL-IP in the internet as you might expect';
+					  break;
+				  default:
+					    
+					  break;
+			  }
+			
+		
+		}
+		
+	 
+
+
+		$oidplus_content_text = (false === strpos($oidplus_content_text, '%%CRUD%%'))
+			? $oidplus_content_text . $CRUD 
+			: str_replace('%%CRUD%%', \PHP_EOL . $CRUD . \PHP_EOL . '%%CRUD%%', $oidplus_content_text);
+
+}//modifyContent
+
+
+	
+	
 function prepare_shortcode(){
 	add_shortcode('IncludeFrame', __NAMESPACE__.'\iframe_shortcode');
-	add_shortcode('RefreshHeader', __NAMESPACE__.'\refresh_header_shortcode');
-    add_shortcode('ObjectRepositoryLink', __NAMESPACE__.'\object_repository_link');
-    add_shortcode('ListAllShortcodes', '\display_shortcodes');
+	add_shortcode('RefreshHeader', __NAMESPACE__.'\refresh_header_shortcode');    
+	add_shortcode('ObjectRepositoryLink', __NAMESPACE__.'\object_repository_link');    
+	add_shortcode('ListAllShortcodes', '\display_shortcodes');
 }	
 	
-	
-// Shortcode
-//add_shortcode('markdown', __NAMESPACE__.'\markdown');
-	
-/*
-add_action(
-		'oidplus_public_pages_tree',
-		__NAMESPACE__.'\public_pages_tree',
-		0//,
-		//string $include_path = null,
-	);
-add_action(	'oidplus_public_pages_gui',	__NAMESPACE__.'\public_pages_gui',	0, null);
-*/
- 
 
+	
 //you can use autowiring as from container->invoker->call( \callable | closure(autowired arguments), [parameters]) !!!
 return (function( ){
  add_action(	'oidplus_prepare_shortcode',	__NAMESPACE__.'\prepare_shortcode',	0, null);	 
+ add_action(	'oidplus_modifyContent',	__NAMESPACE__.'\modifyContent',	0, null);	 
 });
 	
 }//namespace of the plugin
