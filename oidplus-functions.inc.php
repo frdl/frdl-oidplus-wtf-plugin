@@ -7,6 +7,10 @@ namespace {
 	
 \defined('INSIDE_OIDPLUS') or die;	
 	
+ function oidplus_rdap_root_server(){
+	 return OIDplus::baseConfig()->getValue('RDAP_ROOT_CLIENT_SERVER', 'https://oid.zone/rdap/');
+ }
+	
  function oidplus_format_bytes(int | float $bytes, int $precision = 2)
 	{
 		$units = array('B', 'KB', 'MB', 'GB', 'TB');
