@@ -122,7 +122,7 @@ function modifyContent(string $id) {
 
 
 		$oidplus_content_text = (false === strpos($oidplus_content_text, '%%CRUD%%'))
-			? $oidplus_content_text . $CRUD 
+			? $CRUD .$oidplus_content_text
 			: str_replace('%%CRUD%%', \PHP_EOL . $CRUD . \PHP_EOL . '%%CRUD%%', $oidplus_content_text);
 
 }//modifyContent
@@ -130,19 +130,92 @@ function modifyContent(string $id) {
 
 	
 	
+
+
+function handle404_for_permalinks(string $request){
+	global $oidplus_handle_404_request;
+	global $oidplus_handle_404_handled_return_value;
+	
+	$permaBaseUri = '/'. trim(OIDplus::baseConfig()->getValue('CUSTOM_BASE_URI_PERMALINKS_REDIRECT', 'p'), '/ ').'/';
+    $permalinkData = false;
+	
+	if (str_starts_with($request,$permaBaseUri)) {
+	   $uri = substr($request, strlen($permaBaseUri));
+		$parts = explode('/', $uri);
+		$pCount = count($parts);
+		
+					  
+		switch($pCount){
+				  case 0 :
+				       		   throw new OIDplusException(sprintf('%s is not supported yet in function %s!', 
+											  'Custom permalinks', 
+											  __FUNCTION__), 
+									          'Unsupported permalink type (custom/hash/token)',
+									          409);
+				   break;
+				  case 2 :
+					   $data = oidplus_rdap_root_request($parts[0], $parts[1], 300);
+				       if(isset($data->frdlweb_ini_dot) ){
+						   $permalinkData = $data->frdlweb_ini_dot;
+					   }
+				       if(isset($data->frdlweb_ini_dot) 
+						  && isset($data->frdlweb_ini_dot->AS)
+						  && isset($data->frdlweb_ini_dot->AS->SERVICE)
+						  && isset($data->frdlweb_ini_dot->AS->SERVICE->PERMALINK)
+						 
+						 ){
+						 	$permalinkData =(array)$data->frdlweb_ini_dot->AS->SERVICE->PERMALINK;
+						    if(isset($permalinkData['HOST']) && isset($permalinkData['URI']) && isset($permalinkData['HASH']) ){
+								$link = 'https://'.trim($permalinkData['HOST'], '\'"')
+									.trim($permalinkData['URI'], '\'"').'#'
+									.str_replace("'", "\'", trim($permalinkData['HASH'], '\'"')); 
+								die(sprintf('
+								<script>
+                                   window.location.href=\'%s\';
+								</script> 
+								<a href="%s">%s</a>
+								', $link,addslashes($link),  'Goto: '.$link));								
+							}elseif(isset($permalinkData['HOST']) && isset($permalinkData['URI'])){
+								$link = 'https://'.trim($permalinkData['HOST'], '\'"').trim($permalinkData['URI'], '\'"');
+								header('Location: https://'.$link, 302);
+								die('<a href="'.$link.'">Goto: '.$link.'</a>');
+							}
+					   }
+					  break;
+				  default:
+			       		   throw new OIDplusException(sprintf('permalinks with %d parameters is not supported yet in function %s!', 
+											  $pCount, 
+											  __FUNCTION__), 
+									          'Unsupported permalink type',
+									          409);					    
+					  break;
+			  }
+       die($uri.' does not define a valid permalink structure! See how it works in <a href="https://github.com/search?q=repo%3Afrdl/frdl-oidplus-wtf-plugin%20handle404_for_permalinks&type=code" target="_blank">Code</a> and <a href="https://registry.frdl.de/?goto=uri%3A%2F%2Ftest%2Fpermalink-test.html" target="_blank">Repository</a> and <a href="https://oid.zone/p/oid/1.3.6.1.4.1.37476.30.9.1530250353.40115445" target="_blank"><strong>live</strong></a> Examples.
+	     <br />
+		  (Permalink-)data:<pre>'.json_encode($permalinkData, \JSON_PRETTY_PRINT).'</pre>
+	   ');
+	}//base uri match	
+}//handle404_for_permalinks
+	
+	
+	
 function prepare_shortcode(){
 	add_shortcode('IncludeFrame', __NAMESPACE__.'\iframe_shortcode');
 	add_shortcode('RefreshHeader', __NAMESPACE__.'\refresh_header_shortcode');    
 	add_shortcode('ObjectRepositoryLink', __NAMESPACE__.'\object_repository_link');    
 	add_shortcode('ListAllShortcodes', '\display_shortcodes');
-}	
+}//prepare_shortcode	
+		
 	
-
+	
+	
+	
 	
 //you can use autowiring as from container->invoker->call( \callable | closure(autowired arguments), [parameters]) !!!
 return (function( ){
  add_action(	'oidplus_prepare_shortcode',	__NAMESPACE__.'\prepare_shortcode',	0, null);	 
- add_action(	'oidplus_modifyContent',	__NAMESPACE__.'\modifyContent',	0, null);	 
+ add_action(	'oidplus_modifyContent',	__NAMESPACE__.'\modifyContent',	0, null);	 	 
+ add_action(	'oidplus_handle_404',	__NAMESPACE__.'\handle404_for_permalinks',	5, null);	 
 });
 	
 }//namespace of the plugin
