@@ -217,62 +217,7 @@ class OIDplusPageWTFunctions extends OIDplusPagePluginPublic
 			   
 	
 	
-	
-    public static function objectCMSPage(string | OIDplusObject $obj, ?bool $verbose = false, ?bool $die = false, ?string $id = null){
-		global $oidplus_current_object_id;
-		global $oidplus_current_page_context;
-		global $oidplus_current_page_verbose;
-		//print_r($obj);die();
-		$page  = \frdl_ini_dot_parse(is_string($obj) ? $obj : $obj->getDescription(), true);
-		$page['data']['id'] = is_string($obj) ? $id : $obj->nodeId();
-		//$data = $page['data']; 
-		// print_r($data);die();
-	 
-		
-		$oidplus_current_object_id = $page['data']['id'];
-		$oidplus_current_page_context = $page;
-		$oidplus_current_page_verbose= $verbose;
-			
-		$html = $page['content']; 
-		
-		  if(!did_action('oidplus_prepare_shortcode')){
-			  do_action('oidplus_prepare_shortcode', __METHOD__);
-		  }
-		$html = \do_shortcode($html);		
-		$page['html'] = $html;
-		
-		unset($oidplus_current_object_id);
-		unset($oidplus_current_page_context);
-		unset($oidplus_current_page_verbose);
-		
-		if(true === $verbose){
-			$format = isset($_GET['format']) ? $_GET['format'] : 'cms';
-			 
-			switch($format){
-				case 'json' :
-					 header('Content-Type: application/json');
-					 echo json_encode($page, \JSON_PRETTY_PRINT);
-					break;
-				case 'cms' ===$format && function_exists('\io4\container') :
-					 $HtmlCompiler = \io4\container()->get('HtmlDocument') ;
-					 $tpl = $HtmlCompiler->compile(static::BODY_REPLACER); 
-					 $pageHTML = str_replace(static::BODY_REPLACER, $page['html'], $tpl);
-					 echo $pageHTML;
-					break;
-				case 'cms' ===$format && !function_exists('\io4\container') :	
-				case 'html' :
-				case 'body' :
-					default :
-					  echo $page['html'] ;
-					break;
-			}			
-		}
-		if(true === $die){
-			die();
-		}
-		return $page;
-	}		
-	
+
 	
    public function gui(string $id, array &$out, bool &$handled): void {
 	   global $oidplus_public_pages_gui_id;
