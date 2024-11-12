@@ -5,7 +5,61 @@ namespace {
 	use ViaThinkSoft\OIDplus\Core\OIDplus;
 	use ViaThinkSoft\OIDplus\Core\OIDplusException;
 	
-\defined('INSIDE_OIDPLUS') or die;	
+\defined('INSIDE_OIDPLUS') or die;
+ 
+ /*
+ * https://gist.github.com/hussnainsheikh/ea33936d469170d98628315043d9980f
+ */
+ function oidplus_prunde_dir(string $dir,int $max_age, ?bool $withRealpath = true) {
+    $list = array();
+  
+    $limit = time() - max(0,$max_age);
+  
+    $dir = true === $withRealpath ? realpath($dir) : $dir; 
+    if (!is_dir($dir)) {
+        return;
+    }
+  
+    $dh = opendir($dir);
+    if ($dh === false) {
+        return;
+    }
+  
+    while (($file = readdir($dh)) !== false) {
+
+        if ($file != "." && $file != "..") {
+
+            $file = $dir . '/' . $file;
+            if (!is_file($file)) {
+                if(count(glob("$file/*")) === 0)
+                    rmdir($file);
+                oidplus_prunde_dir($file, $max_age, $withRealpath);
+            }
+        
+            if (filemtime($file) < $limit) {
+                $list[] = $file;
+                unlink($file);
+            }
+        }
+    }
+    closedir($dh);
+    return $list;
+ }	
+	
+ function oidplus_prunde_cache(?string $subdir = null, int $max_age = 30879000) {
+	 $max_age = max(60,$max_age);
+	 oidplus_prunde_dir(oidplus_cache_dir($subdir), $max_age);
+ }
+	
+ function oidplus_cache_dir(?string $subdir = null){
+  $d = null === $subdir
+	 ? rtrim(OIDplus::getUserDataDir("cache"),'/ \\ ').\DIRECTORY_SEPARATOR
+	 : rtrim(OIDplus::getUserDataDir("cache"),'/ \\ ').\DIRECTORY_SEPARATOR.trim($subdir,'/ \\ ').\DIRECTORY_SEPARATOR;
+  if(null !== $subdir && !is_dir($d)){
+	  mkdir($d, 0755, true); 
+  }
+  return $d;
+ }
 	
  function oidplus_rdap_root_server(){
 	 return OIDplus::baseConfig()->getValue('RDAP_ROOT_CLIENT_SERVER', 'https://oid.zone/rdap/');
