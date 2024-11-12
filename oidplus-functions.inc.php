@@ -10,19 +10,19 @@ namespace {
  /*
  * https://gist.github.com/hussnainsheikh/ea33936d469170d98628315043d9980f
  */
- function oidplus_prunde_dir(string $dir,int $max_age, ?bool $withRealpath = true) {
-    $list = array();
+ function oidplus_prunde_dir(string $dir,int $max_age, ?bool $withRealpath = true,?array &$list = array()) : array {
+  //  $list = array();
   
     $limit = time() - max(0,$max_age);
   
     $dir = true === $withRealpath ? realpath($dir) : $dir; 
     if (!is_dir($dir)) {
-        return;
+        return $list;
     }
   
     $dh = opendir($dir);
     if ($dh === false) {
-        return;
+        return $list;
     }
   
     while (($file = readdir($dh)) !== false) {
@@ -33,7 +33,7 @@ namespace {
             if (!is_file($file)) {
                 if(count(glob("$file/*")) === 0)
                     rmdir($file);
-                oidplus_prunde_dir($file, $max_age, $withRealpath);
+                oidplus_prunde_dir($file, $max_age, $withRealpath, $list);
             }
         
             if (filemtime($file) < $limit) {
@@ -46,12 +46,12 @@ namespace {
     return $list;
  }	
 	
- function oidplus_prunde_cache(?string $subdir = null, int $max_age = 30879000) {
+ function oidplus_prunde_cache(?string $subdir = null, int $max_age = 30879000, ?bool $withRealpath = true) : array {
 	 $max_age = max(60,$max_age);
-	 oidplus_prunde_dir(oidplus_cache_dir($subdir), $max_age);
+	 return oidplus_prunde_dir(oidplus_cache_dir($subdir), $max_age, $withRealpath);
  }
 	
- function oidplus_cache_dir(?string $subdir = null){
+ function oidplus_cache_dir(?string $subdir = null) : string {
   $d = null === $subdir
 	 ? rtrim(OIDplus::getUserDataDir("cache"),'/ \\ ').\DIRECTORY_SEPARATOR
 	 : rtrim(OIDplus::getUserDataDir("cache"),'/ \\ ').\DIRECTORY_SEPARATOR.trim($subdir,'/ \\ ').\DIRECTORY_SEPARATOR;
@@ -61,9 +61,66 @@ namespace {
   return $d;
  }
 	
- function oidplus_rdap_root_server(){
+ function oidplus_cache_file(string | array | stdclass $dataForKey, ?string $subdirCacheName = null, ?string $ext = 'txt') : string {
+	 $d = serialize($dataForKey);
+	 $file = sha1($d).'-'.strlen($d).(null===$ext ? '' : '.'.$ext);
+     $dir = oidplus_cache_dir($subdirCacheName);	 
+  return $dir.$file;
+ }
+	
+	
+ function oidplus_rdap_root_server() : string {
 	 return OIDplus::baseConfig()->getValue('RDAP_ROOT_CLIENT_SERVER', 'https://oid.zone/rdap/');
  }
+	
+ function oidplus_rdap_root_request(string $objectType, string $name, int | null $cacheLimit = 300){
+	 $timeout = 10 * 60;
+	 set_time_limit($timeout + 10);
+	 $dataForKey = [		
+		 'action' => __FUNCTION__,		
+		 'type'=>$objectType,		 
+		 'name'=>$name,
+	];
+	 $file = oidplus_cache_file($dataForKey, __FUNCTION__, 'json');
+	 if(is_null($cacheLimit) || $cacheLimit < 0 || !file_exists($file) || filemtime($file) < time() - intval($cacheLimit) ){
+	   $referer = oidplus_current_url();
+	   $userAgent ='Rdap+Client (OIDplus/wtf-Plugin+'.$_SERVER['HTTP_HOST'].')';
+       $stream_options = array(
+           'http'=>array(		
+			  'timeout' => $timeout, 
+	          'ignore_errors' => true,			 
+		     'follow_location' => true,
+              'method'=>"GET",
+              'header'=>"Accept-language: en\r\n" 
+		   // ."Cookie: foo=bar\r\n"
+                 . "User-Agent: $userAgent\r\n"  
+		       ."Referer: $referer\r\n"
+            )
+        );	   
+         $stream_context = stream_context_create($stream_options);		
+		 $result = @file_get_contents(oidplus_rdap_root_server().'/'.$objectType.'/'.$name, false, $stream_context);	
+		 file_put_contents($file, $result);
+	 }//not in cache or skip cache
+	 
+	   if(!file_exists($file)){
+		   throw new OIDplusException(sprintf('Error in function %s line %d with params "%s" and "%s"!', 
+											  __FUNCTION__, 
+											  __LINE__,
+											 $objectType,
+											 $name), 
+									          'Could not request ROOT RDAP CLIENT SERVER',
+									          409);
+	   }	
+	 $c = file_get_contents($file);
+	 $data = json_decode($c);
+	return $data;
+ }
+
+ function oidplus_current_url(){
+    $protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off' || $_SERVER['SERVER_PORT'] == 443) ? "https://" : "http://";
+    $domainName = $_SERVER['HTTP_HOST'].'/';
+    return $protocol.$domainName. $_SERVER['REQUEST_URI'];
+ }	
 	
  function oidplus_format_bytes(int | float $bytes, int $precision = 2)
 	{
