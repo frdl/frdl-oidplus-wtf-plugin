@@ -89,13 +89,13 @@ function modifyContent(string $id) {
 		if($obj){
 					    $data = \frdl_ini_dot_parse($obj->getDescription())["data"];
 					    $data_json_string = json_encode($data, \JSON_PRETTY_PRINT);
-					    $content_display_data = '<pre>'.$data_json_string.'</pre>';
+					    $content_display_data = '<pre style="max-height:340px;overflow:auto;">'.$data_json_string.'</pre>';
 			
-			           $CRUD.= '<legend>Data from 
+			           $CRUD.= '<legend>Data as from 
 					    <a href="'
 						   .OIDplus::baseConfig()->getValue('RDAP_ROOT_CLIENT_SERVER', 'https://oid.zone/rdap/')
 							   .'oid/1.3.6.1.4.1.37476.9000.108.1276945.19361.24174" target="_blank">
-					    	1.3.6.1.4.1.37476.9000.108.1276945.19361.24174
+					    	specification 1.3.6.1.4.1.37476.9000.108.1276945.19361.24174
 						</a>
 					   </legend>';
 			           $CRUD.= $content_display_data;
@@ -122,7 +122,7 @@ function modifyContent(string $id) {
 
 
 		$oidplus_content_text = (false === strpos($oidplus_content_text, '%%CRUD%%'))
-			? $CRUD .$oidplus_content_text
+			? (count((array)$data)>0?$CRUD .$oidplus_content_text:$oidplus_content_text.$CRUD)
 			: str_replace('%%CRUD%%', \PHP_EOL . $CRUD . \PHP_EOL . '%%CRUD%%', $oidplus_content_text);
 
 }//modifyContent
@@ -177,7 +177,7 @@ function handle404_for_permalinks(string $request){
 								', $link,addslashes($link),  'Goto: '.$link));								
 							}elseif(isset($permalinkData['HOST']) && isset($permalinkData['URI'])){
 								$link = 'https://'.trim($permalinkData['HOST'], '\'"').trim($permalinkData['URI'], '\'"');
-								header('Location: https://'.$link, 302);
+								header('Location: '.$link, 302);
 								die('<a href="'.$link.'">Goto: '.$link.'</a>');
 							}
 					   }
