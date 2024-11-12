@@ -36,7 +36,8 @@ use ViaThinkSoft\OIDplus\Plugins\PublicPages\RestApi\INTF_OID_1_3_6_1_4_1_37476_
 // phpcs:enable PSR1.Files.SideEffects
 
 class OIDplusPageWTFunctions extends OIDplusPagePluginPublic 
-	implements INTF_OID_1_3_6_1_4_1_37476_2_5_2_3_3
+	implements INTF_OID_1_3_6_1_4_1_37476_2_5_2_3_3,/* beforeObject*, afterObject* */
+           INTF_OID_1_3_6_1_4_1_37476_2_5_2_3_2 //  modifyContent 
 	
 	/* INTF_OID_1_3_6_1_4_1_37553_8_1_8_8_53354196964_1276945,
 	           INTF_OID_1_3_6_1_4_1_37476_2_5_2_3_2,//  modifyContent 
@@ -75,6 +76,30 @@ class OIDplusPageWTFunctions extends OIDplusPagePluginPublic
 		  }		
 	}	
 	
+				   
+		   
+	public function modifyContent($id, &$title, &$icon, &$text): void {
+	    global $oidplus_content_title;
+	    global $oidplus_content_icon;
+	    global $oidplus_content_text;
+		
+		$oidplus_content_title = ''.$title;
+		$oidplus_content_icon = ''.$icon;
+		$oidplus_content_text = ''.$text;
+		
+		$action = 'oidplus_'.__FUNCTION__;
+		  if(!did_action($action)){
+			  do_action($action, $id);
+		  }		
+		
+		$title = ''.$oidplus_content_title;	
+		$icon = ''.$oidplus_content_icon;	
+		$text = ''.$oidplus_content_text;
+		
+		unset($oidplus_content_title);
+		unset($oidplus_content_icon);
+		unset($oidplus_content_text);		
+	}
 	
 	/**
 	 * Implements interface INTF_OID_1_3_6_1_4_1_37476_2_5_2_3_3
