@@ -46,7 +46,7 @@ namespace {
     return $list;
  }	
 	
- function oidplus_prunde_cache(?string $subdir = null, int $max_age = 30879000, ?bool $withRealpath = true) : array {
+ function oidplus_prunde_cache(?string $subdir = null, ?int $max_age = 30879000, ?bool $withRealpath = true) : array {
 	 $max_age = max(60,$max_age);
 	 return oidplus_prunde_dir(oidplus_cache_dir($subdir), $max_age, $withRealpath);
  }
