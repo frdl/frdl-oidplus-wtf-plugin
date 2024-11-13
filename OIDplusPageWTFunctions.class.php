@@ -50,11 +50,7 @@ class OIDplusPageWTFunctions extends OIDplusPagePluginPublic
 	           INTF_OID_1_3_6_1_4_1_37476_2_5_2_3_8  /* getNotifications * /*/
 {
 	
-	
-	public const BODY_REPLACER = '@@@@BODYCONTENTREPLACER@@@@';			   	
-
-	
-				   
+	 				   
   public function beforeObjectDelete(string $id): void {
 		$action = 'oidplus_'.__FUNCTION__;
 		  if(!did_action($action)){
@@ -290,9 +286,11 @@ class OIDplusPageWTFunctions extends OIDplusPagePluginPublic
 		   = (//true === @\WPHooksFunctions::defined ||
 			  function_exists('add_action') ||
 			  \call_user_func_array(function(string $file){
+				  	require_once __DIR__.\DIRECTORY_SEPARATOR.'WPHooks.class.php';
+	                require_once __DIR__.\DIRECTORY_SEPARATOR.'Shortcodes.class.php';
 	  	            require_once $file;
               return function_exists('add_action');	 
-           }, [	__DIR__.\DIRECTORY_SEPARATOR.'WPHooksFunctions.class.php']));		
+           }, [	__DIR__.\DIRECTORY_SEPARATOR.'hook-functions.inc.php']));		
 
 		
 		  if(!$isWPHooksFunctionsInstalled){
@@ -317,8 +315,8 @@ class OIDplusPageWTFunctions extends OIDplusPagePluginPublic
 		
 		
 	    $io4Plugin = OIDplus::getPluginByOid("1.3.6.1.4.1.37476.9000.108.19361.24196");
-		if (!is_null($io4Plugin) ) {
-		    $Stubrunner = $io4Plugin->getWebfat(true,false);
+		if (!is_null($io4Plugin) && is_callable([$io4Plugin, 'getWebfat'])) {
+		    $Stubrunner =\call_user_func_array([$io4Plugin, 'getWebfat'], [true,false]);  
 		}else{
 			$Stubrunner = null;
 		} 
