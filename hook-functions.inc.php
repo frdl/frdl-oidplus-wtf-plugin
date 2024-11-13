@@ -1,16 +1,150 @@
 <?php
 /**
+ * Author: Melanie Wehowski, WEID Consortium
+ * Author URI: https://weid.info
+ * License: MIT
+ */
+/**
 global functions wordpress shims
 */
- 
+use Frdlweb\OIDplus\Plugins\PublicPages\WTFunctions\WPHooks; 
+
 \defined('INSIDE_OIDPLUS') or die;
+
+if(!function_exists('frdl_prunde_dir')){
+ function frdl_prunde_dir(string $dir,int $max_age, ?bool $withRealpath = true,?array &$list = array()) : array {
+  //  $list = array();
+  
+    $limit = time() - max(0,$max_age);
+  
+    $dir = true === $withRealpath ? realpath($dir) : $dir; 
+    if (!is_dir($dir)) {
+        return $list;
+    }
+  
+    $dh = opendir($dir);
+    if ($dh === false) {
+        return $list;
+    }
+  
+    while (($file = readdir($dh)) !== false) {
+
+        if ($file != "." && $file != "..") {
+
+            $file = $dir . '/' . $file;
+            if (!is_file($file)) {
+                if(count(glob("$file/*")) === 0)
+                    rmdir($file);
+                frdl_prunde_dir($file, $max_age, $withRealpath, $list);
+            }
+        
+            if (filemtime($file) < $limit) {
+                $list[] = $file;
+                unlink($file);
+            }
+        }
+    }
+    closedir($dh);
+    return $list;
+ }	
+}
+
+
+if(!function_exists('frdl_rdap_request')){	 
+function frdl_rdap_request(string $server,
+						string $name,
+						string $type, 
+						?array $expectedConformances = [],
+						?bool $raw = false,
+					    ?int $timeout = null,
+						?bool $halfStrict = true) : bool | stdclass | string {
+	
+	$timeout = !is_null($timeout) ? max(1,$timeout) : 10 * 60;  
+	 set_time_limit($timeout + 10);
+	
+	$url =$server.'/'.$type.'/'.$name;	
+	
+		 if (\filter_var($url, FILTER_VALIDATE_URL) === false) {
+               return false;
+         }	
+
+	if('https'!==parse_url($url, \PHP_URL_SCHEME)){
+	  return false;	
+	}
+	
+	   $referer = frdl_current_url();
+	   $userAgent ='Rdap+Client (OIDplus/wtf-Plugin+'.$_SERVER['HTTP_HOST'].')';
+       $stream_options = array(
+           'http'=>array(		
+			  'timeout' => $timeout, 
+	          'ignore_errors' => true,			 
+		     'follow_location' => true,
+              'method'=>"GET",
+              'header'=>"Accept-language: en\r\n" 
+		   // ."Cookie: foo=bar\r\n"
+                 . "User-Agent: $userAgent\r\n"  
+		       ."Referer: $referer\r\n"
+            )
+        );	   
+         $stream_context = stream_context_create($stream_options);			
+ $c = @file_get_contents($url, false, $stream_context);
+ if(false === $c)return false;
+  try{
+	$d = json_decode($c);
+	if(!isset($d->objectClassName) || $type !== $d->objectClassName){
+	  return false;	
+	}
+	if(!isset($d->name) || ($name !== $d->name && $type.':'.$name !== $d->name)){
+	  return false;	
+	}	
+
+   if(false !== $halfStrict){
+	if(!isset($d->rdapConformance) || !is_array($d->rdapConformance) || !in_array("rdap_level_0", $d->rdapConformance)){
+	  return false;	
+	}	
+   }
+	  
+    if(is_array($expectedConformances) ){
+	  foreach($expectedConformances as $conformance){
+	     if(!isset($d->rdapConformance) || !is_array($d->rdapConformance) || !in_array($conformance, $d->rdapConformance)){
+	        return false;	
+       	 }			  
+	  }
+	}
+	  
+  }catch(\Exception $e){
+	  return false;	
+  }
+	return true === $raw ? $c : $d;
+}
+}
+
+if(!function_exists('frdl_current_url')){
+ function frdl_current_url(){
+    $protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off' || $_SERVER['SERVER_PORT'] == 443) ? "https://" : "http://";
+    $domainName = $_SERVER['HTTP_HOST'].'/';
+    return $protocol.$domainName. $_SERVER['REQUEST_URI'];
+ }	
+}
+
+
 
 //class_exists(\Webfan\Patches\WPHooks::class) or require_once __DIR__.\DIRECTORY_SEPARATOR.'WPHooks.class.php';
 //class_exists(\Webfan\Patches\Shortcodes::class) or require_once __DIR__.\DIRECTORY_SEPARATOR.'Shortcodes.class.php';
- 
- 
+if(!function_exists('frdl_get_url_redirection')){	 
+ function frdl_get_url_redirection(string $url){
+   $ch= curl_init($url);
+   curl_setopt($ch, \CURLOPT_NOBODY, true);
+   $result = curl_exec($ch);
+   $info = curl_getinfo($ch, \CURLINFO_REDIRECT_URL);
+   curl_close($ch);
+ return  $info; 	
+}
+}
+
+
  if(!function_exists('frdl_parse_mail_addresses')){	 	
-function frdl_parse_mail_addresses($string){
+function frdl_parse_mail_addresses(string $string) : array {
        preg_match_all(<<<REGEXP
 /(?P<email>((?P<account>[\._a-zA-Z0-9-]+)@(?P<provider>[\._a-zA-Z0-9-]+)))/xsi
 REGEXP, $string, $matches, \PREG_PATTERN_ORDER);
@@ -30,7 +164,7 @@ REGEXP, $string, $matches, \PREG_PATTERN_ORDER);
  }	
 	
  if(!function_exists('frdl_array_unflatten')){	 
-	function frdl_array_unflatten(array $arr, $delimiter = '.', $depth = -1)
+	function frdl_array_unflatten(array $arr,string $delimiter = '.', int $depth = -1)
     {
         $output = [];
         foreach ($arr as $key => $value) {
@@ -486,7 +620,7 @@ function get_file_data(string $file,array $default_headers,string $context = '' 
 if(!function_exists('add_filter')){
 function add_filter(string $tag, string | array | \callable | \Closure $function_to_add,  int | bool | null  $priority = 10, int | null $accepted_args = 1)
 {
-	  return \call_user_func_array([\Webfan\Patches\WPHooks::getInstance(), __FUNCTION__], func_get_args());
+	  return \call_user_func_array([WPHooks::getInstance(), __FUNCTION__], func_get_args());
 	//return Whooks::addFilter($tag, $function_to_add, $priority, $accepted_args);
 }
 }
@@ -502,7 +636,7 @@ function add_filter(string $tag, string | array | \callable | \Closure $function
 if(!function_exists('remove_filter')){
 function remove_filter(string $tag,  string | array | \callable | \Closure $function_to_remove, int | bool | null $priority = 10)
 {
-  return \call_user_func_array([\Webfan\Patches\WPHooks::getInstance(), __FUNCTION__], func_get_args());
+  return \call_user_func_array([WPHooks::getInstance(), __FUNCTION__], func_get_args());
 	//	return Whooks::removeFilter($tag, $function_to_remove, $priority);
 }
 }
@@ -516,7 +650,7 @@ function remove_filter(string $tag,  string | array | \callable | \Closure $func
 if(!function_exists('remove_all_filters')){
 function remove_all_filters(string $tag,  int | bool | null  $priority = false) : bool
 {
-  return \call_user_func_array([\Webfan\Patches\WPHooks::getInstance(), __FUNCTION__], func_get_args());
+  return \call_user_func_array([WPHooks::getInstance(), __FUNCTION__], func_get_args());
 	//	return Whooks::removeAllFilters($tag, $priority);
 }
 }
@@ -534,7 +668,7 @@ function remove_all_filters(string $tag,  int | bool | null  $priority = false) 
 if(!function_exists('has_filter')){
 function has_filter(string $tag,string | array | \callable | \Closure | bool $function_to_check = false)
 {
-	  return \call_user_func_array([\Webfan\Patches\WPHooks::getInstance(), __FUNCTION__], func_get_args());
+	  return \call_user_func_array([WPHooks::getInstance(), __FUNCTION__], func_get_args());
 	//return Whooks::hasFilter($tag, $function_to_check);
 }
 }
@@ -549,7 +683,7 @@ function has_filter(string $tag,string | array | \callable | \Closure | bool $fu
 if(!function_exists('apply_filters')){
 function apply_filters(string $tag, mixed $value)
 {
-	  return \call_user_func_array([\Webfan\Patches\WPHooks::getInstance(), __FUNCTION__], func_get_args());
+	  return \call_user_func_array([WPHooks::getInstance(), __FUNCTION__], func_get_args());
 	//return Whooks::applyFilters($tag, $value);
 }
 }
@@ -582,7 +716,7 @@ function apply_filters_ref_array(string $tag, mixed $args)
 if(!function_exists('add_action')){
 function add_action(string $tag, string | array | \callable | \Closure $function_to_add, int | bool | null $priority = 10,int |null $accepted_args = 1)
 {
-	  return \call_user_func_array([\Webfan\Patches\WPHooks::getInstance(), __FUNCTION__], func_get_args());
+	  return \call_user_func_array([WPHooks::getInstance(), __FUNCTION__], func_get_args());
 	//return Whooks::addAction($tag, $function_to_add, $priority, $accepted_args);
 }
 }
@@ -600,7 +734,7 @@ function add_action(string $tag, string | array | \callable | \Closure $function
 if(!function_exists('has_action')){
 function has_action(string $tag, string | array | \callable | \Closure | bool $function_to_check = false)
 {
-	  return \call_user_func_array([\Webfan\Patches\WPHooks::getInstance(), __FUNCTION__], func_get_args());
+	  return \call_user_func_array([WPHooks::getInstance(), __FUNCTION__], func_get_args());
 	//return Whooks::hasAction($tag, $function_to_check);
 }
 }
@@ -615,7 +749,7 @@ function has_action(string $tag, string | array | \callable | \Closure | bool $f
 if(!function_exists('remove_action')){
 function remove_action(string $tag, string | array | \callable | \Closure  $function_to_remove,int | bool | null $priority = 10)
 {
-	  return \call_user_func_array([\Webfan\Patches\WPHooks::getInstance(), __FUNCTION__], func_get_args());
+	  return \call_user_func_array([WPHooks::getInstance(), __FUNCTION__], func_get_args());
 	//return Whooks::removeAction($tag, $function_to_remove, $priority);
 }
 }
@@ -629,7 +763,7 @@ function remove_action(string $tag, string | array | \callable | \Closure  $func
 if(!function_exists('remove_all_actions')){
 function remove_all_actions(string $tag,int | bool | null $priority = false)
 {
-	  return \call_user_func_array([\Webfan\Patches\WPHooks::getInstance(), __FUNCTION__], func_get_args());
+	  return \call_user_func_array([WPHooks::getInstance(), __FUNCTION__], func_get_args());
 	//return Whooks::removeAllActions($tag, $priority);
 }
 }
@@ -644,7 +778,7 @@ function remove_all_actions(string $tag,int | bool | null $priority = false)
 if(!function_exists('do_action')){
 function do_action(string $tag, mixed $arg = '')
 {
-	  return \call_user_func_array([\Webfan\Patches\WPHooks::getInstance(), __FUNCTION__], func_get_args());
+	  return \call_user_func_array([WPHooks::getInstance(), __FUNCTION__], func_get_args());
 	//return Whooks::doAction($tag, $arg);
 }
 }
@@ -658,7 +792,7 @@ function do_action(string $tag, mixed $arg = '')
 if(!function_exists('do_action_ref_array')){
 function do_action_ref_array(string $tag, array $args)
 {
-	  return \call_user_func_array([\Webfan\Patches\WPHooks::getInstance(), __FUNCTION__], func_get_args());
+	  return \call_user_func_array([WPHooks::getInstance(), __FUNCTION__], func_get_args());
 	//return Whooks::doActionRefArray($tag, $args);
 }
 }
@@ -671,10 +805,12 @@ function do_action_ref_array(string $tag, array $args)
 if(!function_exists('did_action')){
 function did_action(string $tag)
 {
-	  return \call_user_func_array([\Webfan\Patches\WPHooks::getInstance(), __FUNCTION__], func_get_args());
+	  return \call_user_func_array([WPHooks::getInstance(), __FUNCTION__], func_get_args());
 	//return Whooks::didAction($tag);
 }
 }
+
+
 /**
  * Retrieve the name of the current filter or action.
  *
@@ -683,7 +819,7 @@ function did_action(string $tag)
 if(!function_exists('current_filter')){
 function current_filter()
 {
-	  return \call_user_func_array([\Webfan\Patches\WPHooks::getInstance(), __FUNCTION__], func_get_args());
+	  return \call_user_func_array([WPHooks::getInstance(), __FUNCTION__], func_get_args());
 	//return Whooks::currentFilter();
 }
 }
@@ -695,7 +831,7 @@ function current_filter()
 if(!function_exists('current_action')){
 function current_action()
 {
-	  return \call_user_func_array([\Webfan\Patches\WPHooks::getInstance(), __FUNCTION__], func_get_args());
+	  return \call_user_func_array([WPHooks::getInstance(), __FUNCTION__], func_get_args());
 	//return Whooks::currentAction();
 }
 }
@@ -715,7 +851,7 @@ function current_action()
 if(!function_exists('doing_filter')){
 function doing_filter(null|string $filter = null) : bool
 {
-	  return \call_user_func_array([\Webfan\Patches\WPHooks::getInstance(), __FUNCTION__], func_get_args());
+	  return \call_user_func_array([WPHooks::getInstance(), __FUNCTION__], func_get_args());
 	//return Whooks::doingFilter($filter);
 }
 }
@@ -729,7 +865,7 @@ function doing_filter(null|string $filter = null) : bool
 if(!function_exists('doing_action')){
 function doing_action(string|null $action = null) : bool
 {
-  return \call_user_func_array([\Webfan\Patches\WPHooks::getInstance(), __FUNCTION__], func_get_args());
+  return \call_user_func_array([WPHooks::getInstance(), __FUNCTION__], func_get_args());
 	//	return Whooks::doingAction($action);
 }
 }
@@ -737,7 +873,7 @@ function doing_action(string|null $action = null) : bool
 if(!function_exists('add_shortcode')){
 function add_shortcode( )
 {
-	  return \call_user_func_array([\Webfan\Patches\WPHooks::getInstance(), __FUNCTION__], func_get_args());
+	  return \call_user_func_array([WPHooks::getInstance(), __FUNCTION__], func_get_args());
 	//return Whooks::doingFilter($filter);
 }
 }	
@@ -745,7 +881,7 @@ function add_shortcode( )
 if(!function_exists('do_shortcode')){
 function do_shortcode( )
 {
-	  return \call_user_func_array([\Webfan\Patches\WPHooks::getInstance(), __FUNCTION__], func_get_args());
+	  return \call_user_func_array([WPHooks::getInstance(), __FUNCTION__], func_get_args());
 	//return Whooks::doingFilter($filter);
 }
 }		
@@ -755,7 +891,7 @@ function do_shortcode( )
 if(!function_exists('strip_shortcodes')){
 function strip_shortcodes( )
 {
-	  return \call_user_func_array([\Webfan\Patches\WPHooks::getInstance(), __FUNCTION__], func_get_args());
+	  return \call_user_func_array([WPHooks::getInstance(), __FUNCTION__], func_get_args());
 }
 }		
 	
@@ -763,7 +899,7 @@ function strip_shortcodes( )
 if(!function_exists('shortcode_atts')){
 function shortcode_atts( )
 {
-	  return \call_user_func_array([\Webfan\Patches\WPHooks::getInstance(), __FUNCTION__], func_get_args());
+	  return \call_user_func_array([WPHooks::getInstance(), __FUNCTION__], func_get_args());
 }
 }			
 	
@@ -771,7 +907,7 @@ function shortcode_atts( )
 if(!function_exists('shortcode_parse_atts')){
 function shortcode_parse_atts( )
 {
-	  return \call_user_func_array([\Webfan\Patches\WPHooks::getInstance(), __FUNCTION__], func_get_args());
+	  return \call_user_func_array([WPHooks::getInstance(), __FUNCTION__], func_get_args());
 }
 }			
 	
@@ -782,7 +918,7 @@ function shortcode_parse_atts( )
 if(!function_exists('has_shortcode')){
 function has_shortcode( )
 {
-	  return \call_user_func_array([\Webfan\Patches\WPHooks::getInstance(), __FUNCTION__], func_get_args());
+	  return \call_user_func_array([WPHooks::getInstance(), __FUNCTION__], func_get_args());
 }
 }			
 		
@@ -791,8 +927,13 @@ function has_shortcode( )
 if(!function_exists('display_shortcodes')){
 function display_shortcodes( )
 {
-	  return \call_user_func_array([\Webfan\Patches\WPHooks::getInstance(), __FUNCTION__], func_get_args());
+	  return \call_user_func_array([WPHooks::getInstance(), __FUNCTION__], func_get_args());
 }
 }			
 				
-	 
+if(!function_exists('did_filter')){
+function did_filter( )
+{
+	  return \call_user_func_array([WPHooks::getInstance(), __FUNCTION__], func_get_args());
+}
+}		 
