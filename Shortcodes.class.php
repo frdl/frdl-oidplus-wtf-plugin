@@ -1,8 +1,13 @@
 <?php
+/**
+ * Author: Frdlweb
+ * Author URI: https://frdl.de
+ * License: MIT
+ */
+namespace Frdlweb\OIDplus\Plugins\PublicPages\WTFunctions; 
+//namespace Webfan;
 
-namespace Webfan;
-
-use Webfan\Patches\WPHooks as Hooks;
+use Frdlweb\OIDplus\Plugins\PublicPages\WTFunctions\WPHooks as Hooks;
 /**
  * This is a port of WordPress' brilliant shortcode feature
  * for use outside of WordPress. The code has remained largely unchanged
@@ -11,6 +16,8 @@ use Webfan\Patches\WPHooks as Hooks;
  *
  * @package Shortcodes
  * https://github.com/Badcow/Shortcodes
+ *
+ * Extended by Melanie Wehowski, Frdlweb/Webfan <https://frdl.de>
  */
 class Shortcodes
 {
