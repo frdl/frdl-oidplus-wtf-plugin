@@ -77,6 +77,7 @@ namespace {
 	 $timeout = 10 * 60;
 	 set_time_limit($timeout + 10);
 	 $dataForKey = [		
+		 'server' => oidplus_rdap_root_server(),
 		 'action' => __FUNCTION__,		
 		 'type'=>$objectType,		 
 		 'name'=>$name,
