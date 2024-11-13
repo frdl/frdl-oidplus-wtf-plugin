@@ -667,7 +667,14 @@ class WPHooks
 
     return $this->actions[$tag];
   }
+	
+  public function did_filter( string $hook_name ) : int {
+    if (!\is_array($this->filters) || !isset($this->filters[$tag])) {
+      return 0;
+    }
 
+    return $this->filters[$tag];
+  }
   /**
    * Retrieve the name of the current filter or action.
    *
