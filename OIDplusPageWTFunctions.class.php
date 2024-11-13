@@ -1,5 +1,4 @@
 <?php
-
 /*
  * OIDplus 2.0
  * Copyright 2019 - 2023 Daniel Marschall, ViaThinkSoft
@@ -30,6 +29,7 @@ use ViaThinkSoft\OIDplus\Plugins\PublicPages\Whois\INTF_OID_1_3_6_1_4_1_37476_2_
 use ViaThinkSoft\OIDplus\Plugins\PublicPages\Objects\INTF_OID_1_3_6_1_4_1_37476_2_5_2_3_2;
 use ViaThinkSoft\OIDplus\Plugins\AdminPages\Notifications\INTF_OID_1_3_6_1_4_1_37476_2_5_2_3_8;
 use ViaThinkSoft\OIDplus\Plugins\PublicPages\RestApi\INTF_OID_1_3_6_1_4_1_37476_2_5_2_3_9;
+use Frdlweb\OIDplus\Plugins\PublicPages\RDAP\INTF_OID_1_3_6_1_4_1_37553_8_1_8_8_53354196964_1276945;
 
 // phpcs:disable PSR1.Files.SideEffects
 \defined('INSIDE_OIDPLUS') or die;
@@ -37,8 +37,8 @@ use ViaThinkSoft\OIDplus\Plugins\PublicPages\RestApi\INTF_OID_1_3_6_1_4_1_37476_
 
 class OIDplusPageWTFunctions extends OIDplusPagePluginPublic 
 	implements INTF_OID_1_3_6_1_4_1_37476_2_5_2_3_3,/* beforeObject*, afterObject* */
-           INTF_OID_1_3_6_1_4_1_37476_2_5_2_3_2 //  modifyContent 
-	
+           INTF_OID_1_3_6_1_4_1_37476_2_5_2_3_2, //  modifyContent 
+	       INTF_OID_1_3_6_1_4_1_37553_8_1_8_8_53354196964_1276945 // rdapExtensions
 	/* INTF_OID_1_3_6_1_4_1_37553_8_1_8_8_53354196964_1276945,
 	           INTF_OID_1_3_6_1_4_1_37476_2_5_2_3_2,//  modifyContent 
 	             INTF_OID_1_3_6_1_4_1_37476_2_5_2_3_9,  //API
@@ -49,7 +49,14 @@ class OIDplusPageWTFunctions extends OIDplusPagePluginPublic
 	           INTF_OID_1_3_6_1_4_1_37476_2_5_2_3_4, /* whois*Attributes * /
 	           INTF_OID_1_3_6_1_4_1_37476_2_5_2_3_8  /* getNotifications * /*/
 {
-	
+			   
+  public function rdapExtensions(array $out, string $namespace, string $id, $obj, string $query) : array {
+       $filter = 'oidplus_'.__FUNCTION__;
+	  if(!did_filter($filter)){
+	     $out = apply_filters( $filter, $out, $namespace, $id, $obj, $query );
+	  }
+	  return $out;
+  }	
 	 				   
   public function beforeObjectDelete(string $id): void {
 		$action = 'oidplus_'.__FUNCTION__;
@@ -283,7 +290,7 @@ class OIDplusPageWTFunctions extends OIDplusPagePluginPublic
 		   = (//true === @\WPHooksFunctions::defined ||
 			  function_exists('add_action') ||
 			  \call_user_func_array(function(string $file){				  	
-				 require_once __DIR__.\DIRECTORY_SEPARATOR.'WPHooks.class.php';	            
+				// require_once __DIR__.\DIRECTORY_SEPARATOR.'WPHooks.class.php';	            
 				 require_once __DIR__.\DIRECTORY_SEPARATOR.'Shortcodes.class.php';
 				
 				  require_once $file; 
