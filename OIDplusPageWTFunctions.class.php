@@ -285,9 +285,10 @@ class OIDplusPageWTFunctions extends OIDplusPagePluginPublic
 		   = (//true === @\WPHooksFunctions::defined ||
 			  function_exists('add_action') ||
 			  \call_user_func_array(function(string $file){				  	
-				  require_once __DIR__.\DIRECTORY_SEPARATOR.'WPHooks.class.php';	            
-				  require_once __DIR__.\DIRECTORY_SEPARATOR.'Shortcodes.class.php';	  	         
-				  require_once $file;
+				 require_once __DIR__.\DIRECTORY_SEPARATOR.'WPHooks.class.php';	            
+				 require_once __DIR__.\DIRECTORY_SEPARATOR.'Shortcodes.class.php';
+				
+				  require_once $file; 
               return function_exists('add_action');	 
            }, [	__DIR__.\DIRECTORY_SEPARATOR.'hook-functions.inc.php']));		
 
