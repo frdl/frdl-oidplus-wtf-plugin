@@ -87,7 +87,10 @@ function modifyContent(string $id) {
 	    $obj = OIDplusObject::parse($id);
 	
 		if($obj){
-					    $data = \frdl_ini_dot_parse($obj->getDescription())["data"];
+			            $description = $obj->getDescription();
+					    $data = is_string($description) && !empty($description)
+							      ? \frdl_ini_dot_parse($description)["data"]
+							      : [];
 					    $data_json_string = json_encode($data, \JSON_PRETTY_PRINT);
 					    $content_display_data = '<pre title="click to expand" style="max-height:120px;overflow:auto;" onclick="this.style.maxHeight=\'95%\';this.setAttribute(\'title\', \'data from specification 1.3.6.1.4.1.37476.9000.108.1276945.19361.24174\');">'.$data_json_string.'</pre>';
 			
@@ -200,93 +203,6 @@ function handle404_for_permalinks(string $request){
 }//handle404_for_permalinks
 	
 	
-
-	
-//MUST BE FIRST FILTER (priority=0)	
-function rdapExtensions_frdlweb_ini_dot(array $out, string $namespace, string $id, $obj, string $query) : array {
-		$ns = $namespace;
-		$n = [
-			$namespace,
-			$id,
-		];
-		
-		 
-		if ( !is_null(OIDplus::getPluginByOid("1.3.6.1.4.1.37476.2.5.2.4.1.100"))) { // OIDplusPagePublicWhois
-		
-			// DM 03.08.2024 : Code moved to OID-IP plugin (SVN Rev 1540)
-
-		}else{
-		   //no oidplus_oidip plugin
-			$out['remarks'][] = [
-				"title" => "Availability",
-				"description" => [
-					sprintf("The %s %s is MISSING.", 'OID-IP Result from RDAP-plugin', "1.3.6.1.4.1.37476.2.5.2.4.1.100"),
-				],
-				"links"=> []
-			];
-			//$out['oidplus_oidip'] = false;
-		}	
-		//oidplus_oidip
-		
-				
-
-		                 
-						$description =strip_tags($obj->getDescription()); 	 
-							  
-	       $ext = frdl_ini_dot_parse($description)['data'];
-		
-			
-		$out['remarks'][] = [
-				"title" => "frdlweb_ini_dot is available",
-				"description" => [
-					sprintf("Additional %s from %s was added.", 'RDAP-extension Result', "1.3.6.1.4.1.37476.9000.108.1276945.19361.24174.17741"),
-				],
-				"links" => [					
-								
-					[
-						"href"=> 'https://hosted.oidplus.com/viathinksoft/?goto=oid%3A1.3.6.1.4.1.37476.9000.108.1276945.19361.24174.17741',
-							"type"=> "text/plain",
-							"title"=> sprintf("frdlweb_ini_dot for the %s %s (Plaintext)", $ns, $n[1]),
-							"value"=> 'https://hosted.oidplus.com/viathinksoft/?goto=oid%3A1.3.6.1.4.1.37476.9000.108.1276945.19361.24174.17741',
-							"rel"=> "help"
-						],		
-				],				
-		];
-				
-		    $out['frdlweb_ini_dot'] = $ext;
-			$out['rdapConformance'][]='frdlweb_ini_dot'; 
-
- return $out;
-}//RDAP extensions frdlweb_ini_dot  			   
-	
-	
-function rdapExtensions_redirect_with_content(array $out, string $namespace, string $id, $obj, string $query) : array {
-		$ns = $namespace;
-		$n = [
-			$namespace,
-			$id,
-		];
-		
-		 		
-		//redirect_with_content
-		$out['rdapConformance'][]='redirect_with_content'; 
-		if(isset($out['frdlweb_ini_dot']['RDAP'])){
-			  if(isset($out['frdlweb_ini_dot']['RDAP']['URL']['AUTHORITATIV'])
-			//	 && isset($out['frdlweb_ini_dot']['RDAP']['SYSTEM']) 
-				){
-				  $url = rtrim( $out['frdlweb_ini_dot']['RDAP']['URL']['AUTHORITATIV'],'/ ').'/';
-				  $url.= $ns.'/';
-				  $url.= $id;			 
-				  $headers = @get_headers($url);                
-				  $exists = (bool) strpos($headers[0], '200');  
-				  if($exists){
-					  $out['redirect_with_content'] = $url;
-				  }
-			  }
-		}//$out['frdlweb_ini_dot']['RDAP']
- return $out;
-}//RDAP extensions redirect_with_content  
-	
 	
 	
 function prepare_shortcode(){
@@ -303,13 +219,9 @@ function prepare_shortcode(){
 	
 //you can use autowiring as from container->invoker->call( \callable | closure(autowired arguments), [parameters]) !!!
 return (function( ){
- add_action(	'oidplus_prepare_shortcode',	__NAMESPACE__.'\prepare_shortcode',	5, null);	 
-	
- add_action(	'oidplus_modifyContent',	__NAMESPACE__.'\modifyContent',	5, null);	 	 	 	 
- add_action(	'oidplus_handle404',	__NAMESPACE__.'\handle404_for_permalinks',	5);	 
-	
- add_filter( 'oidplus_rdapExtensions', __NAMESPACE__.'\rdapExtensions_frdlweb_ini_dot', 0,  5 );
- add_filter( 'oidplus_rdapExtensions', __NAMESPACE__.'\rdapExtensions_redirect_with_content', 1,  5 );	
+ add_action(	'oidplus_prepare_shortcode',	__NAMESPACE__.'\prepare_shortcode',	0, null);	 
+ add_action(	'oidplus_modifyContent',	__NAMESPACE__.'\modifyContent',	0, null);	 	 
+ add_action(	'oidplus_handle404',	__NAMESPACE__.'\handle404_for_permalinks',	10, null);	 
 });
 	
 }//namespace of the plugin
