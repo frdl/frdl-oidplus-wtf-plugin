@@ -234,21 +234,19 @@ class OIDplusPageWTFunctions extends OIDplusPagePluginPublic
    }
 		
 	public function handle404(string $request): bool {
-		global $oidplus_handle_404_request;
-	//	global $oidplus_handle_404_rel_url_original;
 		global $oidplus_handle_404_handled_return_value;
 		
 		$oidplus_handle_404_handled_return_value = false;
-		$oidplus_handle_404_request = $request;
-		// $oidplus_handle_404_rel_url_original = $rel_url_original;	
-		  if(function_exists('did_action') && !did_action('oidplus_handle_404')){
+		
+		$action = 'oidplus_'.__FUNCTION__;
+		  if(!did_action($action)){
 			 // do_action('oidplus_handle_404', [$rel_url_original,$request]);
-			  do_action('oidplus_handle_404', $request);
+			  do_action($action, $request);
 		  }		
-		 $request = $oidplus_handle_404_request;
+		// $request = $oidplus_handle_404_request;
 		// $rel_url_original = $oidplus_handle_404_rel_url_original;
 			 
-		unset($oidplus_handle_404_request);
+		//unset($oidplus_handle_404_request);
 		//unset($oidplus_handle_404_rel_url_original);	
 		return $oidplus_handle_404_handled_return_value;
 	}
