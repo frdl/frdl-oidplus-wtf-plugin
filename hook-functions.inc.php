@@ -5,8 +5,8 @@ global functions wordpress shims
  
 \defined('INSIDE_OIDPLUS') or die;
 
-class_exists(\Webfan\Patches\WPHooks::class) or require_once __DIR__.\DIRECTORY_SEPARATOR.'WPHooks.class.php';
-class_exists(\Webfan\Patches\Shortcodes::class) or require_once __DIR__.\DIRECTORY_SEPARATOR.'Shortcodes.class.php';
+//class_exists(\Webfan\Patches\WPHooks::class) or require_once __DIR__.\DIRECTORY_SEPARATOR.'WPHooks.class.php';
+//class_exists(\Webfan\Patches\Shortcodes::class) or require_once __DIR__.\DIRECTORY_SEPARATOR.'Shortcodes.class.php';
  
  
  if(!function_exists('frdl_parse_mail_addresses')){	 	
