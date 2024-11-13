@@ -89,7 +89,7 @@ function modifyContent(string $id) {
 		if($obj){
 					    $data = \frdl_ini_dot_parse($obj->getDescription())["data"];
 					    $data_json_string = json_encode($data, \JSON_PRETTY_PRINT);
-					    $content_display_data = '<pre title="click to expand" style="max-height:120px;overflow:auto;" onclick="this.style.maxHeight=\'95%\';">'.$data_json_string.'</pre>';
+					    $content_display_data = '<pre title="click to expand" style="max-height:120px;overflow:auto;" onclick="this.style.maxHeight=\'95%\';this.setAttribute(\'title\', \'data from specification 1.3.6.1.4.1.37476.9000.108.1276945.19361.24174\');">'.$data_json_string.'</pre>';
 			
 			           $CRUD.= '<legend>Data as from 
 					    <a href="'
@@ -132,8 +132,7 @@ function modifyContent(string $id) {
 	
 
 
-function handle404_for_permalinks(string $request){
-	global $oidplus_handle_404_request;
+function handle404_for_permalinks(string $request){ 
 	global $oidplus_handle_404_handled_return_value;
 	
 	$permaBaseUri = '/'. trim(OIDplus::baseConfig()->getValue('CUSTOM_BASE_URI_PERMALINKS_REDIRECT', 'p'), '/ ').'/';
@@ -155,6 +154,7 @@ function handle404_for_permalinks(string $request){
 				   break;
 				  case 2 :
 					   $data = oidplus_rdap_root_request($parts[0], $parts[1], 300);
+				       $permalinkData = $data;
 				       if(isset($data->frdlweb_ini_dot) ){
 						   $permalinkData = $data->frdlweb_ini_dot;
 					   }
@@ -194,8 +194,11 @@ function handle404_for_permalinks(string $request){
 	     <br />
 		  (Permalink-)data:<pre>'.json_encode($permalinkData, \JSON_PRETTY_PRINT).'</pre>
 	   ');
-	}//base uri match	
+		$oidplus_handle_404_handled_return_value = true;
+	}//base uri match
+	
 }//handle404_for_permalinks
+	
 	
 	
 	
@@ -215,7 +218,7 @@ function prepare_shortcode(){
 return (function( ){
  add_action(	'oidplus_prepare_shortcode',	__NAMESPACE__.'\prepare_shortcode',	0, null);	 
  add_action(	'oidplus_modifyContent',	__NAMESPACE__.'\modifyContent',	0, null);	 	 
- add_action(	'oidplus_handle_404',	__NAMESPACE__.'\handle404_for_permalinks',	10, null);	 
+ add_action(	'oidplus_handle404',	__NAMESPACE__.'\handle404_for_permalinks',	10, null);	 
 });
 	
 }//namespace of the plugin
