@@ -89,7 +89,7 @@ function modifyContent(string $id) {
 		if($obj){
 					    $data = \frdl_ini_dot_parse($obj->getDescription())["data"];
 					    $data_json_string = json_encode($data, \JSON_PRETTY_PRINT);
-					    $content_display_data = '<pre style="max-height:340px;overflow:auto;">'.$data_json_string.'</pre>';
+					    $content_display_data = '<pre title="click to expand" style="max-height:120px;overflow:auto;" onclick="this.style.maxHeight=\'95%\';">'.$data_json_string.'</pre>';
 			
 			           $CRUD.= '<legend>Data as from 
 					    <a href="'
@@ -215,7 +215,7 @@ function prepare_shortcode(){
 return (function( ){
  add_action(	'oidplus_prepare_shortcode',	__NAMESPACE__.'\prepare_shortcode',	0, null);	 
  add_action(	'oidplus_modifyContent',	__NAMESPACE__.'\modifyContent',	0, null);	 	 
- add_action(	'oidplus_handle_404',	__NAMESPACE__.'\handle404_for_permalinks',	5, null);	 
+ add_action(	'oidplus_handle_404',	__NAMESPACE__.'\handle404_for_permalinks',	10, null);	 
 });
 	
 }//namespace of the plugin
