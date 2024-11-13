@@ -1,10 +1,14 @@
 <?php
-
+/**
+ * Author: Frdlweb
+ * Author URI: https://frdl.de
+ * License: MIT
+ */
 declare(strict_types=1);
- 
-namespace Webfan\Patches;
+namespace Frdlweb\OIDplus\Plugins\PublicPages\WTFunctions; 
+//namespace Webfan\Patches;
 
-use Webfan\Shortcodes;
+use Frdlweb\OIDplus\Plugins\PublicPages\WTFunctions\Shortcodes;
 /**
  * PHP Hooks Class (Modified)
  *
