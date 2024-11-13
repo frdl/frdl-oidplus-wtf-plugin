@@ -2,31 +2,13 @@
 /**
 global functions wordpress shims
 */
-namespace {	
-	require_once __DIR__.\DIRECTORY_SEPARATOR.'WPHooks.class.php';
-	require_once __DIR__.\DIRECTORY_SEPARATOR.'Shortcodes.class.php';
-}
+ 
+\defined('INSIDE_OIDPLUS') or die;
 
-
-namespace Webfan\Patches {
-//use MirazMac\Whooks\Whooks;
-use Webfan\Patches\WPHooks as Hooks;
-
-class WPHooksFunctions extends \stdclass
-{
-	const defined = true;
-}
-}//ns
-
-namespace {	
-
-//use Webfan\Patches\WPHooks as Hooks;
-	
-class WPHooksFunctions extends \stdclass
-{
-	const defined = true;
-}	
-	
+class_exists(\Webfan\Patches\WPHooks::class) or require_once __DIR__.\DIRECTORY_SEPARATOR.'WPHooks.class.php';
+class_exists(\Webfan\Patches\Shortcodes::class) or require_once __DIR__.\DIRECTORY_SEPARATOR.'Shortcodes.class.php';
+ 
+ 
  if(!function_exists('frdl_parse_mail_addresses')){	 	
 function frdl_parse_mail_addresses($string){
        preg_match_all(<<<REGEXP
@@ -550,7 +532,7 @@ function remove_all_filters(string $tag,  int | bool | null  $priority = false) 
  * the === operator for testing the return value.
  */
 if(!function_exists('has_filter')){
-function has_filter($tag, $function_to_check = false)
+function has_filter(string $tag,string | array | \callable | \Closure | bool $function_to_check = false)
 {
 	  return \call_user_func_array([\Webfan\Patches\WPHooks::getInstance(), __FUNCTION__], func_get_args());
 	//return Whooks::hasFilter($tag, $function_to_check);
@@ -616,7 +598,7 @@ function add_action(string $tag, string | array | \callable | \Closure $function
  * the === operator for testing the return value.
  */
 if(!function_exists('has_action')){
-function has_action($tag, $function_to_check = false)
+function has_action(string $tag, string | array | \callable | \Closure | bool $function_to_check = false)
 {
 	  return \call_user_func_array([\Webfan\Patches\WPHooks::getInstance(), __FUNCTION__], func_get_args());
 	//return Whooks::hasAction($tag, $function_to_check);
@@ -813,5 +795,4 @@ function display_shortcodes( )
 }
 }			
 				
-		
-}//ns
+	 
