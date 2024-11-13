@@ -168,6 +168,15 @@ function handle404_for_permalinks(string $request){
 						 
 						 ){
 						 	$permalinkData =(array)$data->frdlweb_ini_dot->AS->SERVICE->PERMALINK;
+						   $permalinkData =(array)$permalinkData;
+						   foreach($permalinkData as $key=>$value){
+							   if(!is_string($permalinkData[$key])){
+								    foreach($permalinkData[$key] as $key2=>$value2){
+										$permalinkData[$key] = $value2;
+										break;
+									}
+							   }
+						   }
 						    if(isset($permalinkData['HOST']) && isset($permalinkData['URI']) && isset($permalinkData['HASH']) ){
 								$link = 'https://'.trim($permalinkData['HOST'], '\'"')
 									.trim($permalinkData['URI'], '\'"').'#'
