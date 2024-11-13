@@ -1,7 +1,10 @@
 <?php
+/**
+ * Author: WEID Consortium
+ * Author URI: https://weid.info
+ * License: MIT
+ */
 
-namespace {
-	
 	use ViaThinkSoft\OIDplus\Core\OIDplus;
 	use ViaThinkSoft\OIDplus\Core\OIDplusException;
 	
@@ -11,39 +14,7 @@ namespace {
  * https://gist.github.com/hussnainsheikh/ea33936d469170d98628315043d9980f
  */
  function oidplus_prunde_dir(string $dir,int $max_age, ?bool $withRealpath = true,?array &$list = array()) : array {
-  //  $list = array();
-  
-    $limit = time() - max(0,$max_age);
-  
-    $dir = true === $withRealpath ? realpath($dir) : $dir; 
-    if (!is_dir($dir)) {
-        return $list;
-    }
-  
-    $dh = opendir($dir);
-    if ($dh === false) {
-        return $list;
-    }
-  
-    while (($file = readdir($dh)) !== false) {
-
-        if ($file != "." && $file != "..") {
-
-            $file = $dir . '/' . $file;
-            if (!is_file($file)) {
-                if(count(glob("$file/*")) === 0)
-                    rmdir($file);
-                oidplus_prunde_dir($file, $max_age, $withRealpath, $list);
-            }
-        
-            if (filemtime($file) < $limit) {
-                $list[] = $file;
-                unlink($file);
-            }
-        }
-    }
-    closedir($dh);
-    return $list;
+    return \call_user_func_array(str_replace('oidplus', 'frdl', __FUNCTION__), func_get_args());
  }	
 	
  function oidplus_prunde_cache(?string $subdir = null, ?int $max_age = 30879000, ?bool $withRealpath = true) : array {
@@ -84,22 +55,13 @@ namespace {
 	];
 	 $file = oidplus_cache_file($dataForKey, __FUNCTION__, 'json');
 	 if(is_null($cacheLimit) || $cacheLimit < 0 || !file_exists($file) || filemtime($file) < time() - intval($cacheLimit) ){
-	   $referer = oidplus_current_url();
-	   $userAgent ='Rdap+Client (OIDplus/wtf-Plugin+'.$_SERVER['HTTP_HOST'].')';
-       $stream_options = array(
-           'http'=>array(		
-			  'timeout' => $timeout, 
-	          'ignore_errors' => true,			 
-		     'follow_location' => true,
-              'method'=>"GET",
-              'header'=>"Accept-language: en\r\n" 
-		   // ."Cookie: foo=bar\r\n"
-                 . "User-Agent: $userAgent\r\n"  
-		       ."Referer: $referer\r\n"
-            )
-        );	   
-         $stream_context = stream_context_create($stream_options);		
-		 $result = @file_get_contents(oidplus_rdap_root_server().'/'.$objectType.'/'.$name, false, $stream_context);	
+		$result =  frdl_rdap_request(oidplus_rdap_root_server(),
+						 $name,
+						$objectType, 
+						null,
+						true,
+					    $timeout,
+						true);
 		 file_put_contents($file, $result);
 	 }//not in cache or skip cache
 	 
@@ -117,10 +79,9 @@ namespace {
 	return $data;
  }
 
+
  function oidplus_current_url(){
-    $protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off' || $_SERVER['SERVER_PORT'] == 443) ? "https://" : "http://";
-    $domainName = $_SERVER['HTTP_HOST'].'/';
-    return $protocol.$domainName. $_SERVER['REQUEST_URI'];
+    return frdl_current_url();
  }	
 	
  function oidplus_format_bytes(int | float $bytes, int $precision = 2)
@@ -187,4 +148,3 @@ ORDER BY (data_length + index_length) DESC";
 		];
 	}//oidplus_quota_used_db				
 	
-}
