@@ -216,10 +216,9 @@ class OIDplusPageWTFunctions extends OIDplusPagePluginPublic
 
 	
    public function gui(string $id, array &$out, bool &$handled): void {
-	   global $oidplus_public_pages_gui_id;
-       global $oidplus_public_pages_gui_out;
-       global $oidplus_public_pages_gui_handled;
-		
+	   global $oidplus_public_pages_gui_id;       
+	   global $oidplus_public_pages_gui_out;       
+	   global $oidplus_public_pages_gui_handled;		
  
 	      $oidplus_public_pages_gui_id = $id;
 		  $oidplus_public_pages_gui_out = $out;
@@ -285,10 +284,10 @@ class OIDplusPageWTFunctions extends OIDplusPagePluginPublic
 		$isWPHooksFunctionsInstalled 
 		   = (//true === @\WPHooksFunctions::defined ||
 			  function_exists('add_action') ||
-			  \call_user_func_array(function(string $file){
-				  	require_once __DIR__.\DIRECTORY_SEPARATOR.'WPHooks.class.php';
-	                require_once __DIR__.\DIRECTORY_SEPARATOR.'Shortcodes.class.php';
-	  	            require_once $file;
+			  \call_user_func_array(function(string $file){				  	
+				  require_once __DIR__.\DIRECTORY_SEPARATOR.'WPHooks.class.php';	            
+				  require_once __DIR__.\DIRECTORY_SEPARATOR.'Shortcodes.class.php';	  	         
+				  require_once $file;
               return function_exists('add_action');	 
            }, [	__DIR__.\DIRECTORY_SEPARATOR.'hook-functions.inc.php']));		
 
