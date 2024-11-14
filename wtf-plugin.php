@@ -308,10 +308,13 @@ function prepare_shortcode(){
 	
 	
 	
-	
+function init(bool $html = true){
+	wp_cache_init();
+}
 	
 //you can use autowiring as from container->invoker->call( \callable | closure(autowired arguments), [parameters]) !!!
 return (function( ){
+ add_action(	'frdl_wtf_init',	__NAMESPACE__.'\init',	0, null);
  add_action(	'oidplus_prepare_shortcode',	__NAMESPACE__.'\prepare_shortcode',	0, null);
 	
  add_action(	'oidplus_modifyContent',	__NAMESPACE__.'\modifyContent',	0, null);	 	 
