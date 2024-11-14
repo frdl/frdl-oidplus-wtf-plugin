@@ -285,40 +285,24 @@ class OIDplusPageWTFunctions extends OIDplusPagePluginPublic
 	 * @return void
 	 */
 	public function init(bool $html=true): void {
-		       
-		$isWPHooksFunctionsInstalled 
-		   = (//true === @\WPHooksFunctions::defined ||
-			  function_exists('add_action') ||
-			  \call_user_func_array(function(string $file){				  	
-				// require_once __DIR__.\DIRECTORY_SEPARATOR.'WPHooks.class.php';	            
-				 require_once __DIR__.\DIRECTORY_SEPARATOR.'Shortcodes.class.php';
-				
-				  require_once $file; 
-              return function_exists('add_action');	 
-           }, [	__DIR__.\DIRECTORY_SEPARATOR.'hook-functions.inc.php']));		
+		
+		require_once __DIR__.\DIRECTORY_SEPARATOR.'load-functions.inc.php';
+		require_once __DIR__.\DIRECTORY_SEPARATOR.'hook-functions.inc.php';
+		require_once __DIR__.\DIRECTORY_SEPARATOR.'cache-functions.inc.php';
+		require_once __DIR__.\DIRECTORY_SEPARATOR.'oidplus-functions.inc.php';
+/*
+			class_alias(wpdb::class, \wpdb::class);	 
+			class_alias(PDO_Engine::class, \PDO_Engine::class);	 
+			class_alias(pdo_db::class, \pdo_db::class);
+*/	 
+		
+			class_alias(WP_Object_Cache::class, \WP_Object_Cache::class);		
+		
 
 		
-		  if(!$isWPHooksFunctionsInstalled){
-			 throw new \Exception('Could not init wp-functions-shim in '.__METHOD__.' '.__LINE__);  
-		  }
-		
-		
-		
-		$isFunctionsInstalled 
-		   = (//true === @\WPHooksFunctions::defined ||
-			  function_exists('oidplus_quota_used_db') ||
-			  \call_user_func_array(function(string $file){
-	  	            require_once $file;
-              return function_exists('oidplus_quota_used_db');	 
-           }, [	__DIR__.\DIRECTORY_SEPARATOR.'oidplus-functions.inc.php']));		
 
 		
-		  if(!$isFunctionsInstalled){
-			 throw new \Exception('Could not init oidplus-functions in '.__METHOD__.' '.__LINE__);  
-		  }
-				
-		
-		
+			
 	    $io4Plugin = OIDplus::getPluginByOid("1.3.6.1.4.1.37476.9000.108.19361.24196");
 		if (!is_null($io4Plugin) && is_callable([$io4Plugin, 'getWebfat'])) {
 		    $Stubrunner =\call_user_func_array([$io4Plugin, 'getWebfat'], [true,false]);  
@@ -364,7 +348,9 @@ class OIDplusPageWTFunctions extends OIDplusPagePluginPublic
 			}		
 		
 			 
-		 
+		  if(!did_action('frdl_wtf_init')){
+			  do_action('frdl_wtf_init', $html);
+		  }		 
 	}
 	
 }
