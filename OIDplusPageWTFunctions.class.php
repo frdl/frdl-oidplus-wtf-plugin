@@ -288,16 +288,16 @@ class OIDplusPageWTFunctions extends OIDplusPagePluginPublic
 		
 		require_once __DIR__.\DIRECTORY_SEPARATOR.'load-functions.inc.php';
 		require_once __DIR__.\DIRECTORY_SEPARATOR.'hook-functions.inc.php';
-		require_once __DIR__.\DIRECTORY_SEPARATOR.'cache-functions.inc.php';
 		require_once __DIR__.\DIRECTORY_SEPARATOR.'oidplus-functions.inc.php';
+		require_once __DIR__.\DIRECTORY_SEPARATOR.'cache-functions.inc.php';
 /*
 			class_alias(wpdb::class, \wpdb::class);	 
 			class_alias(PDO_Engine::class, \PDO_Engine::class);	 
 			class_alias(pdo_db::class, \pdo_db::class);
-*/	 
+
 		
 			class_alias(WP_Object_Cache::class, \WP_Object_Cache::class);		
-		
+*/	 		
 
 		
 
@@ -332,7 +332,9 @@ class OIDplusPageWTFunctions extends OIDplusPagePluginPublic
  
 		    // userdata and tenant plugins, for OIDplus the are "anonympous"!?! 
 			foreach(  array_merge(glob(OIDplus::getUserDataDir('', true)."/plugins/*/*/*/wtf-plugin.php"),
-								 glob(OIDplus::getUserDataDir('')."/plugins/*/*/*/wtf-plugin.php")
+								 glob(OIDplus::getUserDataDir('')."/plugins/*/*/*/wtf-plugin.php"),
+								 glob("userdata/plugins-wtf-custom/*/*/*/wtf-plugin.php"),
+								 glob("userdata/plugins-wtf-custom/*.php") 
 					)  as $file){
 				$pData = \get_file_data($file, ['Name'=>'Plugin Name', 'Author'=>'Author', 'Version'=>'Version', 'License'=>'License',]);
 				if(count($pData) >= 3){
@@ -347,10 +349,11 @@ class OIDplusPageWTFunctions extends OIDplusPagePluginPublic
 				}				
 			}		
 		
-			 
-		  if(!did_action('frdl_wtf_init')){
-			  do_action('frdl_wtf_init', $html);
-		  }		 
+			
+		wp_cache_init();
+		
+		
+		do_action('frdl_wtf_init', $html); 
 	}
 	
 }
