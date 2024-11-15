@@ -143,6 +143,7 @@ ORDER BY (data_length + index_length) DESC";
 		}
 		
 		return [
+			'total_formated'=>oidplus_format_bytes($sum, 2),	
 			'total'=>$sum,			
 			'used'=>$t,			
 		];
