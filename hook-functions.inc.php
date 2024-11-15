@@ -34,29 +34,78 @@ function wp_protect_special_option(string $option ) {
 	}
 }
 
-function wp_load_alloptions(?bool $allFields = false): array { 
 
-		$options = array();
-		$descriptions = array();
-		$protectSettings = array();
-		$visibleSettings = array();
+function wp_load_alloptions(?bool  $force_cache = false ) :array {
+	//global $wpdb;
+
+	/**
+	 * Filters the array of alloptions before it is populated.
+	 *
+	 * Returning an array from the filter will effectively short circuit
+	 * wp_load_alloptions(), returning that value instead.
+	 *
+	 * @since 6.2.0
+	 *
+	 * @param array|null $alloptions  An array of alloptions. Default null.
+	 * @param bool       $force_cache Whether to force an update of the local cache from the persistent cache. Default false.
+	 */
+	$alloptions = apply_filters( 'pre_wp_load_alloptions', null, $force_cache );
+	if ( is_array( $alloptions ) ) {
+		return $alloptions;
+	}
+
+	if ( ! wp_installing() || ! is_multisite() ) {
+		$alloptions = wp_cache_get( 'alloptions', 'options', $force_cache );
+	} else {
+		$alloptions = false;
+	}
+
+	if ( ! $alloptions ) {
+		/*
+		$suppress      = $wpdb->suppress_errors();
+		$alloptions_db = $wpdb->get_results( "SELECT option_name, option_value FROM $wpdb->options WHERE autoload IN ( '" . implode( "', '", esc_sql( wp_autoload_values_to_autoload() ) ) . "' )" );
+
+		if ( ! $alloptions_db ) {
+			$alloptions_db = $wpdb->get_results( "SELECT option_name, option_value FROM $wpdb->options" );
+		}
+		$wpdb->suppress_errors( $suppress );
+
+		$alloptions = array();
+		foreach ( (array) $alloptions_db as $o ) {
+			$alloptions[ $o->option_name ] = $o->option_value;
+		}
+       */
+		$alloptions = array();
 		$res = OIDplus::db()->query("select name, description, protected, visible, value from ###config");
 		while ($row = $res->fetch_object()) {
-		  $options[$row->name] = true !== $allFields
-			? $row->value 
-			: [
-				'value'=>$row->value,
-				'description'=>$row->description,
-				'protected'=>$row->protected,
-				'visible'=>$row->visible,
-			];
-			$descriptions[$row->name] = $row->description;
-			$protectSettings[$row->name] = $row->protected;
-			$visibleSettings[$row->name] = $row->visible;
+			$alloptions[ $row->name ] = $row->value;
 		}
-	return $options;
+		
+		
+		if ( ! wp_installing() || ! is_multisite() ) {
+			/**
+			 * Filters all options before caching them.
+			 *
+			 * @since 4.9.0
+			 *
+			 * @param array $alloptions Array with all options.
+			 */
+			$alloptions = apply_filters( 'pre_cache_alloptions', $alloptions );
+
+			wp_cache_add( 'alloptions', $alloptions, 'options' );
+		}
+	}
+
+	/**
+	 * Filters all options after retrieving them.
+	 *
+	 * @since 4.9.0
+	 *
+	 * @param array $alloptions Array with all options.
+	 */
+	return apply_filters( 'alloptions', $alloptions );
 }
- 
+
 
 function add_option( string $option, $value = '', $deprecated = '', $autoload = null ) {
 	//global $wpdb;
