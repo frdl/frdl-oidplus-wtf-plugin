@@ -309,7 +309,7 @@ function prepare_shortcode(){
 	
 	
 function init(bool $html = true){
-	wp_cache_init();
+	
 }
 	
 //you can use autowiring as from container->invoker->call( \callable | closure(autowired arguments), [parameters]) !!!
