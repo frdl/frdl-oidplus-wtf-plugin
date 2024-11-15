@@ -309,12 +309,20 @@ class OIDplusPageWTFunctions extends OIDplusPagePluginPublic
 		}else{
 			$Stubrunner = null;
 		} 
+		
+		
 		//Pluginfiles
+		
+		//For use in the "Standard-"-OIDplus plugins-structure
 		foreach(OIDplus::getAllPlugins() as $plugin){
 			$dir = $plugin->getPluginDirectory();
 			$file = rtrim($dir, '\\/ ').\DIRECTORY_SEPARATOR.'wtf-plugin.php';
 			if(file_exists($file)){
 				//this my be different from OIDplus Plugin manifest.json, mhh...???
+				//YES, as they must be pluggable without heavy metadata regsitering steps overhead for developing small 
+				//addon functions
+				//AND the hooks are meant NOT to be bound to a specific module BUT to be hooked by EVERY OTHER module
+				//cross-plugin hookabillity
 				$pData = \get_file_data($file, ['Name'=>'Plugin Name', 'Author'=>'Author', 'Version'=>'Version', 'License'=>'License',]);
 				if(count($pData) >= 3){
 					$fn = include $file;
@@ -330,11 +338,34 @@ class OIDplusPageWTFunctions extends OIDplusPagePluginPublic
 			
 		}	
  
+		    /*
+			  ToDo:
+			     - use DIrectoryIterators instead of glob!
+			     - initially, periodically or by setup/update cache the list of
+			       pluginfiles in file or db
+			     - to the cached list/table add the feature to 
+				- disable/enable plugins
+			        - sort order/priority
+			*/
 		    // userdata and tenant plugins, for OIDplus the are "anonympous"!?! 
-			foreach(  array_merge(glob(OIDplus::getUserDataDir('', true)."/plugins/*/*/*/wtf-plugin.php"),
+			foreach(  array_merge(
+				                 //Central-/Tenant Domain Plugins with the "Standard-"-OIDplus plugins-structure
 								 glob(OIDplus::getUserDataDir('')."/plugins/*/*/*/wtf-plugin.php"),
-								 glob("userdata/plugins-wtf-custom/*/*/*/wtf-plugin.php"),
-								 glob("userdata/plugins-wtf-custom/*.php") 
+				                 //Public Central-/Tenant Domain Plugins with the "Standard-"-OIDplus plugins-structure
+				                 glob(OIDplus::getUserDataDir('', true)."/plugins/*/*/*/wtf-plugin.php"),
+				
+				                 // Custom Plugins to be edited by Webmaster 
+				                 // or häkisch external developers
+				                 // unofficial private plugins
+				
+				                // e.g. userdata/plugins-wtf-custom/example-plugin.inc.php
+								 glob("userdata/plugins-wtf-custom/*.php"), 
+				
+				                 // e.g. userdata/plugins-wtf-custom/example-plugin/wtf-plugin.php
+								 glob("userdata/plugins-wtf-custom/*/wtf-plugin.php"),
+				
+				                 // e.g. userdata/plugins-wtf-custom/frdl/wtfPlugins/example/wtf-plugin.php
+								 glob("userdata/plugins-wtf-custom/*/*/*/wtf-plugin.php")
 					)  as $file){
 				$pData = \get_file_data($file, ['Name'=>'Plugin Name', 'Author'=>'Author', 'Version'=>'Version', 'License'=>'License',]);
 				if(count($pData) >= 3){
@@ -349,10 +380,11 @@ class OIDplusPageWTFunctions extends OIDplusPagePluginPublic
 				}				
 			}		
 		
-			
+		
+		//before do actions init cache:	
 		wp_cache_init();
 		
-		
+		//run the plugins init hooks
 		do_action('frdl_wtf_init', $html); 
 	}
 	
