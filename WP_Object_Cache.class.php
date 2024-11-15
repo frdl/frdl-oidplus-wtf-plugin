@@ -79,8 +79,8 @@ class WP_Object_Cache {
 	 * @since 2.0.8
 	 */
 	public function __construct() {
-		$this->multisite   = is_multisite();
-		$this->blog_prefix = $this->multisite ? get_current_blog_id() . ':' : '';
+		$this->multisite   = \is_multisite();
+		$this->blog_prefix = $this->multisite ? \get_current_blog_id() . ':' : '';
 	}
 
 	/**
@@ -197,7 +197,7 @@ class WP_Object_Cache {
 	 * @return bool True on success, false if cache key and group already exist.
 	 */
 	public function add( $key, $data, $group = 'default', $expire = 0 ) {
-		if ( wp_suspend_cache_addition() ) {
+		if ( \wp_suspend_cache_addition() ) {
 			return false;
 		}
 
@@ -613,7 +613,7 @@ class WP_Object_Cache {
 	 * @see switch_to_blog()
 	 */
 	public function reset() {
-		_deprecated_function( __FUNCTION__, '3.5.0', 'WP_Object_Cache::switch_to_blog()' );
+		\_deprecated_function( __FUNCTION__, '3.5.0', 'WP_Object_Cache::switch_to_blog()' );
 
 		// Clear out non-global caches since the blog ID has changed.
 		foreach ( array_keys( $this->cache ) as $group ) {
@@ -638,7 +638,7 @@ class WP_Object_Cache {
 		echo '</p>';
 		echo '<ul>';
 		foreach ( $this->cache as $group => $cache ) {
-			echo '<li><strong>Group:</strong> ' . esc_html( $group ) . ' - ( ' . number_format( strlen( serialize( $cache ) ) / KB_IN_BYTES, 2 ) . 'k )</li>';
+			echo '<li><strong>Group:</strong> ' . \esc_html( $group ) . ' - ( ' . number_format( strlen( serialize( $cache ) ) / \KB_IN_BYTES, 2 ) . 'k )</li>';
 		}
 		echo '</ul>';
 	}
