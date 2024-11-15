@@ -7,6 +7,7 @@
 
 require ABSPATH . WPINC . '/option.php';
  */
+
 /**
  * Converts given MySQL date string into a different format.
  *
