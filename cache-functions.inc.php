@@ -10,7 +10,15 @@
 
 /** WP_Object_Cache class 
 require_once __DIR__ . '/WP_Object_Cache.class.php';
-*/
+*/function wp_suspend_cache_addition( $suspend = null ) {
+	static $_suspend = false;
+
+	if ( is_bool( $suspend ) ) {
+		$_suspend = $suspend;
+	}
+
+	return $_suspend;
+}
 /**
  * Sets up Object Cache Global and assigns it.
  *
@@ -20,7 +28,7 @@ require_once __DIR__ . '/WP_Object_Cache.class.php';
  */
 function wp_cache_init() {
 	//class_exists(WP_Object_Cache::class) or require_once __DIR__ . \DIRECTORY_SEPARATOR . 'WP_Object_Cache.class.php';
-	$GLOBALS['wp_object_cache'] = new WP_Object_Cache();
+	$GLOBALS['wp_object_cache'] = new \Frdlweb\OIDplus\Plugins\PublicPages\WTFunctions\WP_Object_Cache();
 }
 
 /**
