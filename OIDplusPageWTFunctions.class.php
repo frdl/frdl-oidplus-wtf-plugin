@@ -30,7 +30,7 @@ use ViaThinkSoft\OIDplus\Plugins\PublicPages\Objects\INTF_OID_1_3_6_1_4_1_37476_
 use ViaThinkSoft\OIDplus\Plugins\AdminPages\Notifications\INTF_OID_1_3_6_1_4_1_37476_2_5_2_3_8;
 use ViaThinkSoft\OIDplus\Plugins\PublicPages\RestApi\INTF_OID_1_3_6_1_4_1_37476_2_5_2_3_9;
 use Frdlweb\OIDplus\Plugins\PublicPages\RDAP\INTF_OID_1_3_6_1_4_1_37553_8_1_8_8_53354196964_1276945;
-
+use ViaThinkSoft\OIDplus\Plugins\PublicPages\Attachments\INTF_OID_1_3_6_1_4_1_37476_2_5_2_3_11;
 // phpcs:disable PSR1.Files.SideEffects
 \defined('INSIDE_OIDPLUS') or die;
 // phpcs:enable PSR1.Files.SideEffects
@@ -38,7 +38,17 @@ use Frdlweb\OIDplus\Plugins\PublicPages\RDAP\INTF_OID_1_3_6_1_4_1_37553_8_1_8_8_
 class OIDplusPageWTFunctions extends OIDplusPagePluginPublic 
 	implements INTF_OID_1_3_6_1_4_1_37476_2_5_2_3_3,/* beforeObject*, afterObject* */
            INTF_OID_1_3_6_1_4_1_37476_2_5_2_3_2, //  modifyContent 
-	       INTF_OID_1_3_6_1_4_1_37553_8_1_8_8_53354196964_1276945 // rdapExtensions
+	       INTF_OID_1_3_6_1_4_1_37553_8_1_8_8_53354196964_1276945, // rdapExtensions
+           INTF_OID_1_3_6_1_4_1_37476_2_5_2_3_11  //attachments: befor* after*
+			   /*
+			   interface INTF_OID_1_3_6_1_4_1_37476_2_5_2_3_11 {
+        public function beforeAttachmentUpload(string $id, string $filename_relative, array $file_data): void;
+        public function afterAttachmentUpload(string $id, string $filename_relative, array $file_data): void;
+        public function beforeAttachmentDelete(string $id, string $filename_relative): void;
+        public function afterAttachmentDelete(string $id, string $filename_relative): void;
+        public function beforeAttachmentDownload(string $id, string $filename_relative): void;
+}
+*/
 	/* INTF_OID_1_3_6_1_4_1_37553_8_1_8_8_53354196964_1276945,
 	           INTF_OID_1_3_6_1_4_1_37476_2_5_2_3_2,//  modifyContent 
 	             INTF_OID_1_3_6_1_4_1_37476_2_5_2_3_9,  //API
@@ -49,6 +59,42 @@ class OIDplusPageWTFunctions extends OIDplusPagePluginPublic
 	           INTF_OID_1_3_6_1_4_1_37476_2_5_2_3_4, /* whois*Attributes * /
 	           INTF_OID_1_3_6_1_4_1_37476_2_5_2_3_8  /* getNotifications * /*/
 {
+
+  public function beforeAttachmentUpload(string $id, string $filename_relative, array $file_data): void {
+      $filter = 'oidplus_'.__FUNCTION__;
+	  if(!did_filter($filter)){
+	     $out = apply_filters( $filter, $id, $filename_relative, $file_data );
+	  }	  		  
+  }
+			   
+  public function afterAttachmentUpload(string $id, string $filename_relative, array $file_data): void {
+      $filter = 'oidplus_'.__FUNCTION__;
+	  if(!did_filter($filter)){
+	     $out = apply_filters( $filter, $id, $filename_relative, $file_data );
+	  }	  	  
+  }
+			   
+  public function beforeAttachmentDelete(string $id, string $filename_relative): void {
+      $filter = 'oidplus_'.__FUNCTION__;
+	  if(!did_filter($filter)){
+	     $out = apply_filters( $filter, $id, $filename_relative );
+	  }	  	  
+  }
+			   
+  public function afterAttachmentDelete(string $id, string $filename_relative): void {
+      $filter = 'oidplus_'.__FUNCTION__;
+	  if(!did_filter($filter)){
+	     $out = apply_filters( $filter, $id, $filename_relative );
+	  }	  	  
+  }
+			   
+  public function beforeAttachmentDownload(string $id, string $filename_relative): void {
+      $filter = 'oidplus_'.__FUNCTION__;
+	  if(!did_filter($filter)){
+	     $out = apply_filters( $filter, $id, $filename_relative );
+	  }	  
+  }
+			   			   
 			   
   public function rdapExtensions(array $out, string $namespace, string $id, $obj, string $query) : array {
        $filter = 'oidplus_'.__FUNCTION__;
