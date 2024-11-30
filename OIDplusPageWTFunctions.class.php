@@ -40,15 +40,7 @@ class OIDplusPageWTFunctions extends OIDplusPagePluginPublic
            INTF_OID_1_3_6_1_4_1_37476_2_5_2_3_2, //  modifyContent 
 	       INTF_OID_1_3_6_1_4_1_37553_8_1_8_8_53354196964_1276945, // rdapExtensions
            INTF_OID_1_3_6_1_4_1_37476_2_5_2_3_11  //attachments: befor* after*
-			   /*
-			   interface INTF_OID_1_3_6_1_4_1_37476_2_5_2_3_11 {
-        public function beforeAttachmentUpload(string $id, string $filename_relative, array $file_data): void;
-        public function afterAttachmentUpload(string $id, string $filename_relative, array $file_data): void;
-        public function beforeAttachmentDelete(string $id, string $filename_relative): void;
-        public function afterAttachmentDelete(string $id, string $filename_relative): void;
-        public function beforeAttachmentDownload(string $id, string $filename_relative): void;
-}
-*/
+
 	/* INTF_OID_1_3_6_1_4_1_37553_8_1_8_8_53354196964_1276945,
 	           INTF_OID_1_3_6_1_4_1_37476_2_5_2_3_2,//  modifyContent 
 	             INTF_OID_1_3_6_1_4_1_37476_2_5_2_3_9,  //API
@@ -62,36 +54,41 @@ class OIDplusPageWTFunctions extends OIDplusPagePluginPublic
 
   public function beforeAttachmentUpload(string $id, string $filename_relative, array $file_data): void {
       $filter = 'oidplus_'.__FUNCTION__;
+	  $args = func_get_args();
 	  if(!did_filter($filter)){
-	     $out = apply_filters( $filter, $id, $filename_relative, $file_data );
+	     $args = apply_filters( $filter, $args, $id, $filename_relative, $file_data );
 	  }	  		  
   }
 			   
   public function afterAttachmentUpload(string $id, string $filename_relative, array $file_data): void {
       $filter = 'oidplus_'.__FUNCTION__;
+	  $args = func_get_args();
 	  if(!did_filter($filter)){
-	     $out = apply_filters( $filter, $id, $filename_relative, $file_data );
+	     $args = apply_filters( $filter, $args, $id, $filename_relative, $file_data );
 	  }	  	  
   }
 			   
   public function beforeAttachmentDelete(string $id, string $filename_relative): void {
       $filter = 'oidplus_'.__FUNCTION__;
+	  $args = func_get_args();
 	  if(!did_filter($filter)){
-	     $out = apply_filters( $filter, $id, $filename_relative );
+	     $args = apply_filters( $filter, $args, $id, $filename_relative );
 	  }	  	  
   }
 			   
   public function afterAttachmentDelete(string $id, string $filename_relative): void {
       $filter = 'oidplus_'.__FUNCTION__;
+	  $args = func_get_args();
 	  if(!did_filter($filter)){
-	     $out = apply_filters( $filter, $id, $filename_relative );
+	     $args = apply_filters( $filter, $args, $id, $filename_relative );
 	  }	  	  
   }
 			   
   public function beforeAttachmentDownload(string $id, string $filename_relative): void {
       $filter = 'oidplus_'.__FUNCTION__;
+	  $args = func_get_args();
 	  if(!did_filter($filter)){
-	     $out = apply_filters( $filter, $id, $filename_relative );
+	     $args = apply_filters( $filter, $args, $id, $filename_relative );
 	  }	  
   }
 			   			   
