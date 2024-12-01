@@ -31,6 +31,8 @@ use ViaThinkSoft\OIDplus\Plugins\AdminPages\Notifications\INTF_OID_1_3_6_1_4_1_3
 use ViaThinkSoft\OIDplus\Plugins\PublicPages\RestApi\INTF_OID_1_3_6_1_4_1_37476_2_5_2_3_9;
 use Frdlweb\OIDplus\Plugins\PublicPages\RDAP\INTF_OID_1_3_6_1_4_1_37553_8_1_8_8_53354196964_1276945;
 use ViaThinkSoft\OIDplus\Plugins\PublicPages\Attachments\INTF_OID_1_3_6_1_4_1_37476_2_5_2_3_11;
+use ViaThinkSoft\OIDplus\Plugins\PublicPages\Login\INTF_OID_1_3_6_1_4_1_37476_2_5_2_3_5;
+
 // phpcs:disable PSR1.Files.SideEffects
 \defined('INSIDE_OIDPLUS') or die;
 // phpcs:enable PSR1.Files.SideEffects
@@ -39,19 +41,23 @@ class OIDplusPageWTFunctions extends OIDplusPagePluginPublic
 	implements INTF_OID_1_3_6_1_4_1_37476_2_5_2_3_3,/* beforeObject*, afterObject* */
            INTF_OID_1_3_6_1_4_1_37476_2_5_2_3_2, //  modifyContent 
 	       INTF_OID_1_3_6_1_4_1_37553_8_1_8_8_53354196964_1276945, // rdapExtensions
-           INTF_OID_1_3_6_1_4_1_37476_2_5_2_3_11  //attachments: befor* after*
-
-	/* INTF_OID_1_3_6_1_4_1_37553_8_1_8_8_53354196964_1276945,
-	           INTF_OID_1_3_6_1_4_1_37476_2_5_2_3_2,//  modifyContent 
-	             INTF_OID_1_3_6_1_4_1_37476_2_5_2_3_9,  //API
-
+           INTF_OID_1_3_6_1_4_1_37476_2_5_2_3_11,  //attachments: befor* after*
+           INTF_OID_1_3_6_1_4_1_37476_2_5_2_3_5  //alternativeLoginMethods
+	/*           INTF_OID_1_3_6_1_4_1_37476_2_5_2_3_9,  //API
                    INTF_OID_1_3_6_1_4_1_37476_2_5_2_3_7,//public function getAlternativesForQuery(string $id): array;
-	 
-	           INTF_OID_1_3_6_1_4_1_37476_2_5_2_3_3, /* beforeObject*, afterObject* * /
-	           INTF_OID_1_3_6_1_4_1_37476_2_5_2_3_4, /* whois*Attributes * /
+	      INTF_OID_1_3_6_1_4_1_37476_2_5_2_3_4, /* whois*Attributes * /
 	           INTF_OID_1_3_6_1_4_1_37476_2_5_2_3_8  /* getNotifications * /*/
 {
-
+	
+  public function alternativeLoginMethods() :array {
+	  $logins = array();
+      $filter = 'oidplus_'.__FUNCTION__; 
+	  if(!did_filter($filter)){
+	     $logins = apply_filters( $filter, $logins );
+	  }	  		  
+	  return $logins;
+  }			   
+			   
   public function beforeAttachmentUpload(string $id, string $filename_relative, array $file_data): void {
       $filter = 'oidplus_'.__FUNCTION__;
 	  $args = func_get_args();
