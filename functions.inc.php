@@ -6270,6 +6270,7 @@ function wp_guess_url() {
  *                      Defaults to not changing the current setting.
  * @return bool The current suspend setting.
  */
+if(!function_exists('wp_suspend_cache_addition')){
 function wp_suspend_cache_addition(bool $suspend = null ) : bool {
 	static $_suspend = false;
 
@@ -6278,6 +6279,7 @@ function wp_suspend_cache_addition(bool $suspend = null ) : bool {
 	}
 
 	return $_suspend;
+}
 }
 
 /**
