@@ -13,6 +13,20 @@ use ViaThinkSoft\OIDplus\Core\OIDplusConfig;
 
 \defined('INSIDE_OIDPLUS') or die;
 
+function frdl_to_http_query(   
+		array | object $data,    
+		string $numeric_prefix = '',    
+		?string $arg_separator = '&',   
+		int $encoding_type = \PHP_QUERY_RFC1738) : string
+ {
+        return \http_build_query($data, $numeric_prefix, $arg_separator, $encoding_type);
+}
+	
+function frdl_to_query(array | object $data) : string
+{
+		return  preg_replace('/%5B[0-9]+%5D/simU', '%5B%5D', frdl_to_http_query($data, '', '&', \PHP_QUERY_RFC1738) );
+}
+
 
 function wp_protect_special_option(string $option ) {
 
