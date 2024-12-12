@@ -90,11 +90,20 @@ function wp_load_alloptions(?bool  $force_cache = false ) :array {
 		}
        */
 		$alloptions = array();
-		$res = OIDplus::db()->query("select name, description, protected, visible, value from ###config");
-		while ($row = $res->fetch_object()) {
-			$alloptions[ $row->name ] = $row->value;
-		}
-		
+				if(class_exists(\ViaThinkSoft\OIDplus\Core\OIDplus::class) ){	
+					$res = OIDplus::db()->query("select name, description, protected, visible, value from ###config");		
+					while ($row = $res->fetch_object()) {		
+						$alloptions[ $row->name ] = $row->value;		
+					}
+				}elseif(class_exists(\IO4\Context::class) && null !== \IO4\Context::config() ){
+					$config = \IO4\Context::config();
+					foreach ($config as $path => $value) {
+                        //  echo "\n" . $path . ": " . $value;
+						$alloptions[ $path ] = $value;
+                    }
+				}else{
+				    throw new \Exception('Not implemented in '.__FUNCTION__.' line '.__LINE__.' '.basename(__FILE__));
+				}		
 		
 		if ( ! wp_installing() || ! is_multisite() ) {
 			/**
