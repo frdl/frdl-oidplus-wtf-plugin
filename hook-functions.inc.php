@@ -358,7 +358,13 @@ function get_option( string $option, $default_value = false ) {
 										[$option]);
 */
 				
-				$value = OIDplus::config()->getValue($option, null);
+				if(class_exists(\ViaThinkSoft\OIDplus\Core\OIDplus::class) ){
+					$value = OIDplus::config()->getValue($option, null);
+				}elseif(class_exists(\IO4\Context::class) && null !== \IO4\Context::config() ){
+					\IO4\Context::config()->get($option);
+				}else{
+				    throw new \Exception('Not implemented in '.__FUNCTION__.' line '.__LINE__.' '.basename(__FILE__));
+				}
 				// Has to be get_row() instead of get_var() because of funkiness with 0, false, null values.
 				if ( $value   ) {
 					//$value = $row->option_value;
