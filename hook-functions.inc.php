@@ -13,6 +13,34 @@ use ViaThinkSoft\OIDplus\Core\OIDplusConfig;
 
 \defined('INSIDE_OIDPLUS') or die;
 
+ 
+ function frdl_slugify(string $text, string $divider = '-', bool|string $error = 'none')
+  {
+  // replace non letter or digits by divider
+  $text = preg_replace('~[^\pL\d]+~u', $divider, $text);
+
+  // transliterate
+  $text = \iconv('utf-8', 'us-ascii//TRANSLIT', $text);
+
+  // remove unwanted characters
+  $text = preg_replace('~[^-\w]+~', '', $text);
+
+  // trim
+  $text = trim($text, $divider);
+
+  // remove duplicate divider
+  $text = preg_replace('~-+~', $divider, $text);
+
+  // lowercase
+  $text = strtolower($text);
+
+  if (empty($text)) {
+    return $error;
+ }
+}
+
+
+
 function frdl_to_http_query(   
 		array | object $data,    
 		string $numeric_prefix = '',    
